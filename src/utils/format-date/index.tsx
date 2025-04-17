@@ -4,10 +4,11 @@ import {
   isYesterday,
   differenceInDays,
   differenceInMonths,
-} from "date-fns";
+} from 'date-fns';
 
 interface Conversation {
   conversation_id: string;
+  conversation_name: string;
   timestamp: string; // Assuming the timestamp is a string in ISO format
   latest_message: string;
   folder_color: string | null;
@@ -24,7 +25,7 @@ interface GroupedConversations {
 }
 
 export const groupConversationsByTime = (
-  conversations: Conversation[]
+  conversations: Conversation[],
 ): GroupedConversations => {
   const groupedConversations: GroupedConversations = {
     today: [],
@@ -34,7 +35,7 @@ export const groupConversationsByTime = (
     older: [],
   };
 
-  conversations?.forEach((item) => {
+  conversations?.forEach(item => {
     const conversationDate = new Date(item.timestamp);
 
     if (isToday(conversationDate)) {

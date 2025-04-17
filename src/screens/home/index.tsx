@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,14 @@ import {
 } from '../../redux/slices/modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Models} from '../../utils/enums';
+import {
+  get_folders,
+  get_member,
+  list_conversations,
+} from '../../utils/functions';
+import {token} from '../../mock';
+import {setConversation, setFolders} from '../../redux/slices/conversation';
+import {setUser} from '../../redux/slices/user';
 
 // import { FaChevronLeft } from "react-icons/fa"; // Replace with react-native-vector-icons
 // import { IoIosSearch } from "react-icons/io"; // Replace with react-native-vector-icons
@@ -46,6 +54,23 @@ const Home = () => {
   let isLoggedIn = true;
 
   console.log('mode', mode);
+
+  useEffect(() => {
+    const get_data = async () => {
+      try {
+        const res = await list_conversations(token);
+        const data = await get_folders(token);
+        const member = await get_member('mem_cm2n7w5nx009k0strh2nuetp3');
+        dispatch(setUser(member?.data));
+        dispatch(setFolders(data.folders));
+        dispatch(setConversation(res?.conversations));
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    get_data();
+  }, []);
 
   const toggleHeight = () => {
     Animated.parallel([

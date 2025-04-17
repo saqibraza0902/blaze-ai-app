@@ -1,5 +1,5 @@
 export const api =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "https://dev.blazeai.io";
+  process.env.NEXT_PUBLIC_BACKEND_URL || 'https://dev.blazeai.io';
 interface IAssignFolderAdmin {
   token: string;
   id: number | string;
@@ -13,14 +13,14 @@ interface IUCData {
 export const list_conversations = async (token: string) => {
   try {
     const res = await fetch(`${api}/api/list_conversations`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
     if (!res.ok) {
-      return console.log("error");
+      return console.log('error');
     }
     return res.json();
   } catch (error) {
@@ -34,25 +34,25 @@ export const single_conversation = async (token: string, id: string) => {
       `${api}/api/load_chat_history?conversation_id=${id}`,
       {
         headers: {
-          "Content-Type": "application/json",
-          "x-api-key": KEY as string,
+          'Content-Type': 'application/json',
+          'x-api-key': KEY as string,
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     if (!res.ok) {
-      return console.log("error");
+      return console.log('error');
     }
     return res.json();
   } catch (error) {
     console.log(error);
   }
 };
-export const get_members = async (id: string) => {
+export const get_member = async (id: string) => {
   try {
     const res = await fetch(`${api}/member/${id}`);
     if (!res.ok) {
-      return console.log("error");
+      return console.log('error');
     }
     return res.json();
   } catch (error) {
@@ -74,9 +74,9 @@ export const get_folders = async (token: string) => {
 };
 export const create_folder = async (token: string, folderData: any) => {
   const res = await fetch(`${api}/api/folders`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -92,9 +92,9 @@ export const create_folder = async (token: string, folderData: any) => {
 };
 export const delete_folder = async (token: string, id: number) => {
   const res = await fetch(`${api}/api/folders/${id}`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -106,12 +106,12 @@ export const delete_folder = async (token: string, id: number) => {
 };
 export const edit_folder = async (
   token: string,
-  folder: { id: number | null; name: string; color: string }
+  folder: {id: number | null; name: string; color: string},
 ) => {
   const res = await fetch(`${api}/api/folders/${folder.id}`, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -128,12 +128,12 @@ export const edit_folder = async (
 export const move_convo_folder = async (
   token: string,
   fid: number,
-  cid: string
+  cid: string,
 ) => {
   const res = await fetch(`${api}/api/conversations/${cid}/move`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -148,7 +148,7 @@ export const move_convo_folder = async (
 };
 export const get_news = async (id: number) => {
   const res = await fetch(`${api}/news/${id}`, {
-    method: "GET",
+    method: 'GET',
   });
   if (!res.ok) {
     const error = await res.json();
@@ -158,7 +158,7 @@ export const get_news = async (id: number) => {
 };
 export const get_news_index = async () => {
   const res = await fetch(`${api}/news/latest`, {
-    method: "GET",
+    method: 'GET',
   });
   if (!res.ok) {
     const error = await res.json();
@@ -169,12 +169,12 @@ export const get_news_index = async () => {
 
 export const send_invite = async (token: string, body: any) => {
   const res = await fetch(`${api}/api/invite`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ ...body }),
+    body: JSON.stringify({...body}),
   });
   if (!res.ok) {
     const error = await res.json();
@@ -184,9 +184,9 @@ export const send_invite = async (token: string, body: any) => {
 };
 export const accept_invite = async (token: string, id: string) => {
   const res = await fetch(`${api}/api/accept-invite/${id}`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -198,9 +198,9 @@ export const accept_invite = async (token: string, id: string) => {
 };
 export const folder_participants = async (token: string, id: number) => {
   const res = await fetch(`${api}/api/folder/${id}/participants`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -212,9 +212,9 @@ export const folder_participants = async (token: string, id: number) => {
 };
 export const convo_participants = async (token: string, id: string) => {
   const res = await fetch(`${api}/api/conversation/${id}/participants`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -225,11 +225,11 @@ export const convo_participants = async (token: string, id: string) => {
   return res.json();
 };
 export const remove_folder_user = async (props: IAssignFolderAdmin) => {
-  const { id, token, uid } = props;
+  const {id, token, uid} = props;
   const res = await fetch(`${api}/api/folder/${id}/remove-participant`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -243,11 +243,11 @@ export const remove_folder_user = async (props: IAssignFolderAdmin) => {
   return res.json();
 };
 export const remove_convo_user = async (props: IAssignFolderAdmin) => {
-  const { id, token, uid } = props;
+  const {id, token, uid} = props;
   const res = await fetch(`${api}/api/conversation/${id}/remove-participant`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -261,11 +261,11 @@ export const remove_convo_user = async (props: IAssignFolderAdmin) => {
   return res.json();
 };
 export const assign_folder_admin = async (props: IAssignFolderAdmin) => {
-  const { id, token, uid } = props;
+  const {id, token, uid} = props;
   const res = await fetch(`${api}/api/folder/${id}/assign-admin`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -279,11 +279,11 @@ export const assign_folder_admin = async (props: IAssignFolderAdmin) => {
   return res.json();
 };
 export const assign_convo_admin = async (props: IAssignFolderAdmin) => {
-  const { id, token, uid } = props;
+  const {id, token, uid} = props;
   const res = await fetch(`${api}/api/conversation/${id}/assign-admin`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -299,12 +299,12 @@ export const assign_convo_admin = async (props: IAssignFolderAdmin) => {
 export const rename_conversation = async (
   token: string,
   id: string,
-  name: string
+  name: string,
 ) => {
   const res = await fetch(`${api}/api/rename_conversation`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
@@ -320,12 +320,12 @@ export const rename_conversation = async (
 };
 export const update_conversation_setting = async (
   token: string,
-  data: IUCData
+  data: IUCData,
 ) => {
   const res = await fetch(`${api}/api/update_conversation_settings`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
@@ -340,12 +340,12 @@ export const get_conversation_setting = async (token: string, id: string) => {
   const res = await fetch(
     `${api}/api/get_conversation_settings?conversation_id=${id}`,
     {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
   if (!res.ok) {
     const error = await res.json();
@@ -356,9 +356,9 @@ export const get_conversation_setting = async (token: string, id: string) => {
 
 export const get_vector_files = async (token: string) => {
   const res = await fetch(`${api}/api/vector_store/files/list`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -372,12 +372,12 @@ export const get_single_file = async (token: string, id: string) => {
   const res = await fetch(
     `${api}/api/vector_store/files/get_info?file_id=${id}`,
     {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
   if (!res.ok) {
     const error = await res.json();
@@ -389,15 +389,15 @@ export const search_file = async (
   token: string,
   id: string,
   query: string,
-  max: number
+  max: number,
 ) => {
   const res = await fetch(`${api}/api/vector_store_search`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ user_id: id, query: query, max_results: max }),
+    body: JSON.stringify({user_id: id, query: query, max_results: max}),
   });
   if (!res.ok) {
     const error = await res.json();
@@ -409,12 +409,12 @@ export const delete_file = async (token: string, id: string) => {
   const res = await fetch(
     `${api}/api/vector_store/files/delete?file_id=${id}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
   if (!res.ok) {
     const error = await res.json();
@@ -424,9 +424,9 @@ export const delete_file = async (token: string, id: string) => {
 };
 export const retrieve_vector_store = async (token: string) => {
   const res = await fetch(`${api}/api/vector_store/retrieve`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -445,9 +445,9 @@ interface IFeedback {
 }
 export const submit_feedback = async (data: IFeedback, token: string) => {
   const res = await fetch(`${api}/api/feedback`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
@@ -460,9 +460,9 @@ export const submit_feedback = async (data: IFeedback, token: string) => {
 };
 export const get_feedback = async (token: string) => {
   const res = await fetch(`${api}/api/feedback`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
