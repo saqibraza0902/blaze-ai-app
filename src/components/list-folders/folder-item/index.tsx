@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,38 +7,40 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
-} from "react-native";
-import { IFolder, IConversations } from "@/utils/types";
-// import { FaAngleUp, FaAngleDown, FaRegShareFromSquare } from "react-icons/fa";
-// import { FiEdit } from "react-icons/fi";
-// import { BsThreeDotsVertical, BsTrash } from "react-icons/bs";
-// import Popover from "@/components/popover"; // Ensure this is RN-compatible
-// import ConversationItem from "./conversation-item";
-import { useTheme } from "@react-navigation/native";
-import { useAppSelector } from "@/hooks/useRedux";
+  ScrollView,
+} from 'react-native';
+import {IFolder, IConversations} from '../../../utils/types';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather';
+import {useTheme} from '@react-navigation/native';
+import {useAppSelector} from '../../../hooks/useRedux';
+import ConversationItem from '../../list-conversations/conversation-item';
 
 // Enable LayoutAnimation on Android
 if (
-  Platform.OS === "android" &&
+  Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
 ) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const FolderItem = ({ props }: any) => {
-  const {
-    folder,
-    accordionOpen,
-    setAccordionOpen,
-    editOpen,
-    folderDelDialouge,
-    sharedUsers,
-    id,
-    ...c3
-  } = props;
+interface IFolderItemProps {
+  folder: IFolder;
+  accordionOpen: number | null;
+  setAccordionOpen: (id: number | null) => void;
+  onClose?: () => void;
+}
 
-  const { conversations } = useAppSelector((s) => s.convo);
-  const { colors, dark } = useTheme();
+const FolderItem = ({
+  folder,
+  accordionOpen,
+  setAccordionOpen,
+  onClose,
+}: IFolderItemProps) => {
+  const {conversations} = useAppSelector(s => s.convo);
+  const {colors, dark} = useTheme();
+  const [showActions, setShowActions] = useState(false);
 
   const isOpen = accordionOpen === folder.id;
 
@@ -48,74 +50,93 @@ const FolderItem = ({ props }: any) => {
   };
 
   const filteredConvos = conversations?.filter(
-    (convo: IConversations) => convo.folder_id === folder.id
+    (convo: IConversations) => convo.folder_id === folder.id,
   );
 
   return (
-    <View key={folder.id} style={styles.wrapper}>
-      <TouchableOpacity onPress={handleToggle} style={styles.header}>
+    <View style={styles.wrapper}>
+      <TouchableOpacity
+        style={styles.header}
+        onPress={handleToggle}
+        activeOpacity={0.7}>
         <View style={styles.folderInfo}>
-          <View style={[styles.colorDot, { backgroundColor: folder.color }]} />
-          <Text style={[styles.folderName, { color: colors.text }]}>
+          <View style={[styles.colorDot, {backgroundColor: folder.color}]} />
+          <Text style={[styles.folderName, {color: colors.text}]}>
             {folder.name}
+          </Text>
+          <Text style={[styles.countText, {color: colors.text}]}>
+            ({filteredConvos?.length || 0})
           </Text>
         </View>
 
         <View style={styles.actions}>
-          <Text>
-            {/* {isOpen ? (
-              <FaAngleUp color={dark ? "#fff" : "#000"} />
-            ) : (
-              <FaAngleDown color={dark ? "#fff" : "#000"} />
-            )} */}
-          </Text>
+          <MaterialIcons
+            name={isOpen ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+            size={24}
+            color={colors.text}
+          />
 
-          {/* <Popover
-            buttonContent={
-              <BsThreeDotsVertical color={dark ? "#fff" : "#000"} />
-            }
-          >
-            <View style={styles.popover}>
-              <TouchableOpacity
-                onPress={(e) => {
-                  editOpen(folder);
-                }}
-                style={styles.popoverItem}
-              >
-                <Text style={styles.popoverText}>Edit Folder</Text>
-                <FiEdit color="#fff" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => folderDelDialouge(folder.id)}
-                style={styles.popoverItem}
-              >
-                <Text style={styles.popoverText}>Delete Folder</Text>
-                <BsTrash color="#fff" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => sharedUsers(folder, null)}
-                style={styles.popoverItem}
-              >
-                <Text style={styles.popoverText}>Shared Users</Text>
-                <FaRegShareFromSquare color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </Popover> */}
+          <TouchableOpacity
+            onPress={() => setShowActions(!showActions)}
+            style={styles.menuButton}>
+            <MaterialIcons name="more-vert" size={20} color={colors.text} />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
+
+      {showActions && (
+        <View style={[styles.actionsMenu, {backgroundColor: colors.card}]}>
+          <TouchableOpacity
+            style={styles.actionItem}
+            onPress={() => {
+              // editOpen(folder);
+              onClose?.();
+              setShowActions(false);
+            }}>
+            <Feather name="edit" size={18} color={colors.text} />
+            <Text style={[styles.actionText, {color: colors.text}]}>Edit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionItem}
+            onPress={() => {
+              // folderDelDialouge(folder.id);
+              onClose?.();
+              setShowActions(false);
+            }}>
+            <Feather name="trash-2" size={18} color="#ff4444" />
+            <Text style={[styles.actionText, {color: '#ff4444'}]}>Delete</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionItem}
+            onPress={() => {
+              // sharedUsers(folder, null);
+              onClose?.();
+              setShowActions(false);
+            }}>
+            <FontAwesome name="share" size={18} color={colors.text} />
+            <Text style={[styles.actionText, {color: colors.text}]}>Share</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {isOpen && (
         <View style={styles.accordionContent}>
           {filteredConvos?.length === 0 ? (
-            <Text style={styles.emptyText}>No conversations</Text>
+            <Text style={[styles.emptyText, {color: colors.text}]}>
+              No conversations in this folder
+            </Text>
           ) : (
-            filteredConvos.map((convo: IConversations, i: number) => {
-              const folderId = folder.id;
-              const Propsitem = { convo, id, folderId, ...c3 };
-              return <Text>HEllo</Text>;
-            })
+            <ScrollView style={styles.conversationList} nestedScrollEnabled>
+              {filteredConvos?.map((convo: IConversations) => (
+                <ConversationItem
+                  key={convo.conversation_id}
+                  props={{convo: convo, id: convo.conversation_id}}
+                  // onClose={onClose}
+                />
+              ))}
+            </ScrollView>
           )}
         </View>
       )}
@@ -123,22 +144,25 @@ const FolderItem = ({ props }: any) => {
   );
 };
 
-export default FolderItem;
-
 const styles = StyleSheet.create({
   wrapper: {
     marginBottom: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   folderInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
   },
   colorDot: {
     width: 16,
@@ -146,38 +170,51 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   folderName: {
+    fontSize: 16,
+    fontWeight: '500',
+    flexShrink: 1,
+  },
+  countText: {
     fontSize: 14,
+    opacity: 0.7,
   },
   actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-  popover: {
-    backgroundColor: "#2f2f2f",
-    padding: 8,
-    borderRadius: 8,
-    gap: 10,
+  menuButton: {
+    padding: 4,
   },
-  popoverItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+  actionsMenu: {
+    paddingVertical: 8,
     borderRadius: 4,
-    alignItems: "center",
+    elevation: 2,
+    marginHorizontal: 8,
   },
-  popoverText: {
-    color: "#fff",
-    marginRight: 10,
+  actionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  actionText: {
+    fontSize: 14,
   },
   accordionContent: {
-    marginTop: 10,
-    gap: 10,
+    marginTop: 4,
+    maxHeight: 300,
+  },
+  conversationList: {
+    paddingHorizontal: 8,
   },
   emptyText: {
-    color: "#888",
-    fontSize: 13,
-    marginVertical: 10,
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 16,
+    opacity: 0.7,
   },
 });
+
+export default FolderItem;

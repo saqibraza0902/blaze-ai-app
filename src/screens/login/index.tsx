@@ -10,16 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-// import { useNavigation } from "@react-navigation/native";
-// import Icon from 'react-native-vector-icons/Feather';
-// import AntDesign from 'react-native-vector-icons/AntDesign';
-// import Entypo from 'react-native-vector-icons/Entypo';
 
-// import { useDispatch, useSelector } from "react-redux";
-// import { setToken } from "../redux/slices/modal";
-// import { setUser } from "../redux/slices/user";
-// Replace with actual memberstack logic or API calls
-// import { memberstack } from "../utils/memberstack";
 type RootStackParamList = {
   Login: undefined;
   Home: undefined;
@@ -33,10 +24,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // const toast = useToast
-  //   const navigation = useNavigation();
-  //   const dispatch = useDispatch();
 
   const handleLogin = async () => {
     // if (!email || !password) {

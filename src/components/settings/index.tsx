@@ -1,78 +1,92 @@
-import React, { useEffect, useState } from "react";
-import { TouchableOpacity, Image } from "react-native";
+import React, {useState, useEffect} from 'react';
 import {
-  Popover,
-  Box,
-  Button,
+  View,
   Text,
-  VStack,
-  HStack,
-  useTheme,
-  useToast,
-  Avatar,
-  useColorMode,
-} from "native-base";
-import { useNavigation } from "@react-navigation/native";
-// import { IoSettingsOutline } from "react-icons/io5"; // Replace this with a proper RN icon if needed
-import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setConvoNull, setLogout } from "@/redux/slices/conversation";
-import { setModal, setTokenNull } from "@/redux/slices/modal";
-import { setUser } from "@/redux/slices/user";
-// import { memberstack } from "@/utils/memberstack";
-import { get_feedback } from "@/utils/functions";
-import { handleApiError } from "@/utils/error";
-import { ThemedText } from "../ThemedText";
-import { View } from "react-native";
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Modal,
+  ScrollView,
+} from 'react-native';
+import {useTheme} from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
+import {useNavigation} from '@react-navigation/native';
+import {setConvoNull, setLogout} from '../../redux/slices/conversation';
+import {setModal, setTokenNull} from '../../redux/slices/modal';
+import {setUser} from '../../redux/slices/user';
 
-interface IProp {
-  handleToggle: () => void;
+interface SettingsProps {
   openFeedback: () => void;
+  toggleInstructionModal: () => void;
+  onClose?: () => void;
 }
 
-export const Settings = ({ handleToggle, openFeedback }: IProp) => {
-  const { user } = useAppSelector((s) => s.user);
-  const { token } = useAppSelector((s) => s.modal);
-  const { colorMode, toggleColorMode } = useColorMode();
-
+const Settings = ({
+  openFeedback,
+  toggleInstructionModal,
+  onClose,
+}: SettingsProps) => {
+  const {user, token} = useAppSelector(s => ({
+    user: s.user.user,
+    token: s.modal.token,
+  }));
+  const {colors, dark} = useTheme();
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  const [showMenu, setShowMenu] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_count: 0,
     conversation_count: 0,
     message_count: 0,
   });
 
-  const toast = useToast();
-  const dispatch = useAppDispatch();
-
   const handleLogout = () => {
+    // Implement your logout logic here
+    // memberstack?.logout();
+    // localStorage.removeItem("_ms-mem");
     dispatch(setConvoNull());
     dispatch(setLogout());
     dispatch(setTokenNull());
     dispatch(setUser(null));
+    // localStorage.removeItem("focus");
+    // localStorage.removeItem("token");
+    // localStorage.removeItem("modal");
+    onClose?.();
   };
 
   const clickhere = async () => {
     try {
+      // await memberstack?.launchStripeCustomerPortal({
+      //   configuration: {
+      //     invoice_history: {
+      //       enabled: true,
+      //     },
+      //   },
+      // });
+      // navigation.navigate('Billing');
+      onClose?.();
     } catch (error) {
-      const err = handleApiError(error);
-      toast.show({ description: err });
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    const getStats = async () => {
+    // Mock API call to get feedback stats
+    const get_stats = async () => {
       try {
-        const res = await get_feedback(token);
-        setFeedbackData({
-          feedback_count: res?.data?.feedback_count,
-          conversation_count: res?.data?.stats?.conversation_count,
-          message_count: res?.data?.stats?.message_count,
-        });
+        // const res = await get_feedback(token);
+        // setFeedbackData({
+        //   feedback_count: res?.data?.feedback_count,
+        //   conversation_count: res?.data?.stats?.conversation_count,
+        //   message_count: res?.data?.stats?.message_count,
+        // });
       } catch (error) {
-        const err = handleApiError(error);
-        toast.show({ description: err });
+        console.error(error);
       }
     };
-    getStats();
+    get_stats();
   }, [token]);
 
   const shouldShowFeedback =
@@ -84,81 +98,238 @@ export const Settings = ({ handleToggle, openFeedback }: IProp) => {
       feedbackData.feedback_count < 2);
 
   const baseOptions = [
-    { text: "Switch Theme", action: toggleColorMode },
     {
-      text: "Profile Settings",
-      action: () => console.log(""), // You may replace this with external link
+      text: 'Switch Theme',
+      icon: 'color-palette',
+      action: () => {
+        // setTheme(theme === "dark" ? "light" : "dark");
+        onClose?.();
+      },
     },
-    { text: "Billing Information", action: clickhere },
-    { text: "Instructions", action: handleToggle },
-    { text: "Logout", action: handleLogout },
+    {
+      text: 'Profile Settings',
+      icon: 'person',
+      action: () => {
+        // navigation.navigate('ProfileSettings');
+        onClose?.();
+      },
+    },
+    {
+      text: 'Billing Information',
+      icon: 'card',
+      action: () => {
+        clickhere();
+        onClose?.();
+      },
+    },
+    {
+      text: 'Instructions',
+      icon: 'help-circle',
+      action: () => {
+        toggleInstructionModal();
+        onClose?.();
+      },
+    },
+    {
+      text: 'Logout',
+      icon: 'log-out',
+      action: () => {
+        handleLogout();
+        onClose?.();
+      },
+    },
   ];
 
-  const feedbackOption = { text: "Feedback", action: openFeedback };
-  const upgradedOption = {
-    text: "Upgrade to Blaze Max",
-    action: () => console.log("object"),
+  const feedbackOption = {
+    text: 'Feedback',
+    icon: 'chatbox-ellipses',
+    action: () => {
+      openFeedback();
+      onClose?.();
+    },
   };
 
   const NORMAL_OPTIONS = shouldShowFeedback
     ? [...baseOptions.slice(0, 4), feedbackOption, baseOptions[4]]
     : baseOptions;
 
+  const upgradedOption = {
+    text: 'Upgrade to Blaze Max',
+    icon: 'rocket',
+    action: () => {
+      // navigation.navigate('Pricing');
+      onClose?.();
+    },
+  };
+
   const UPGRADED_OPTIONS = shouldShowFeedback
     ? [upgradedOption, ...NORMAL_OPTIONS]
     : [upgradedOption, ...baseOptions];
 
   const OPTIONS =
-    user?.planConnections[0].type === "FREE"
+    user?.planConnections?.[0]?.type === 'FREE'
       ? UPGRADED_OPTIONS
       : NORMAL_OPTIONS;
 
   return (
-    <Popover
-      trigger={(triggerProps) => {
-        return (
-          <TouchableOpacity {...triggerProps} style={{ width: "100%" }}>
-            <HStack
-              justifyContent="space-between"
-              alignItems="center"
-              space={2}
-              w="100%"
-            >
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-              >
-                <Avatar
-                  source={{
-                    uri:
-                      user?.profileImage ??
-                      "https://your-default-avatar-url.com/default.jpg",
-                  }}
-                />
-                <ThemedText>Test User</ThemedText>
-              </View>
-              <Text fontSize="3xl">⚙️</Text>
-            </HStack>
-          </TouchableOpacity>
-        );
-      }}
-    >
-      <Popover.Content
-        w="100%" // ✅ Make it full width
-        maxWidth="100%" // ✅ Ensure no internal max limit
-        style={{ alignSelf: "stretch" }} // ✅ RN-style fallback
-      >
-        <Popover.Body>
-          <VStack space={2} w="xs">
-            {OPTIONS.map((item, i) => (
-              <TouchableOpacity key={i}>
-                <Box px={4} py={2} w="100%">
-                  <Text>{item.text}</Text>
-                </Box>
-              </TouchableOpacity>
-            ))}
-          </VStack>
-        </Popover.Body>
-      </Popover.Content>
-    </Popover>
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.profileButton}
+        onPress={() => setShowMenu(!showMenu)}>
+        <View style={styles.profileInfo}>
+          <Image
+            source={{uri: user?.profileImage}}
+            style={styles.profileImage}
+          />
+          <Text style={[styles.profileName, {color: colors.text}]}>
+            {user?.customFields?.['first-name']}{' '}
+            {user?.customFields?.['last-name']}
+          </Text>
+        </View>
+        <Ionicons name="settings-outline" size={24} color={colors.text} />
+      </TouchableOpacity>
+
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowMenu(false)}>
+          <View
+            style={[
+              styles.menuContainer,
+              {
+                backgroundColor: colors.card,
+                shadowColor: colors.text,
+              },
+            ]}>
+            <ScrollView>
+              {OPTIONS.map((item, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.menuItem,
+                    i === 0 &&
+                      user?.planConnections?.[0]?.type === 'FREE' &&
+                      styles.upgradeItem,
+                  ]}
+                  onPress={() => {
+                    item.action();
+                    setShowMenu(false);
+                  }}>
+                  <View style={styles.menuItemContent}>
+                    <Ionicons
+                      name={item.icon}
+                      size={20}
+                      color={
+                        i === 0 && user?.planConnections?.[0]?.type === 'FREE'
+                          ? '#fff'
+                          : colors.text
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.menuItemText,
+                        {
+                          color:
+                            i === 0 &&
+                            user?.planConnections?.[0]?.type === 'FREE'
+                              ? '#fff'
+                              : colors.text,
+                        },
+                      ]}>
+                      {item.text}
+                    </Text>
+                  </View>
+                  {/* {i === 0 && user?.planConnections?.[0]?.type === 'FREE' && (
+                    <Image
+                      source={require('../../../assets/sprinkles.png')}
+                      style={styles.sprinkles}
+                    />
+                  )} */}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  profileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+    paddingBottom: 20,
+  },
+  menuContainer: {
+    maxHeight: '60%',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  menuItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  upgradeItem: {
+    backgroundColor: '#6a4bed',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+  },
+  menuItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  menuItemText: {
+    fontSize: 16,
+  },
+  sprinkles: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    width: 30,
+    height: 30,
+  },
+});
+
+export default Settings;
