@@ -34,9 +34,8 @@ import {
 import {token} from '../../mock';
 import {setConversation, setFolders} from '../../redux/slices/conversation';
 import {setUser} from '../../redux/slices/user';
-
-// import { FaChevronLeft } from "react-icons/fa"; // Replace with react-native-vector-icons
-// import { IoIosSearch } from "react-icons/io"; // Replace with react-native-vector-icons
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {NativeBaseProvider} from 'native-base';
 
 const {width: WIDTH} = Dimensions.get('window');
 
@@ -47,6 +46,8 @@ const Home = () => {
   const [expanded, setExpanded] = useState(false);
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const rotateValue = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(-60)).current;
+  const iconTranslateAnim = useRef(new Animated.Value(-3)).current;
   const dispatch = useAppDispatch();
   const {conversation_setting} = useAppSelector(s => s.modal);
   const {models, mode} = conversation_setting;
@@ -72,15 +73,24 @@ const Home = () => {
     get_data();
   }, []);
 
-  const toggleHeight = () => {
+  const toggleSlide = () => {
+    const toTranslateY = expanded ? -60 : 15;
+    const toRotate = expanded ? 0 : 1;
+    const toIconTranslate = expanded ? -3 : 2; // change icon's Y translation
+
     Animated.parallel([
-      Animated.timing(animatedHeight, {
-        toValue: expanded ? 0 : 90,
+      Animated.timing(slideAnim, {
+        toValue: toTranslateY,
         duration: 300,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }),
       Animated.timing(rotateValue, {
-        toValue: expanded ? 0 : 1, // toggle between 0 and 1
+        toValue: toRotate,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(iconTranslateAnim, {
+        toValue: toIconTranslate,
         duration: 300,
         useNativeDriver: true,
       }),
@@ -91,7 +101,12 @@ const Home = () => {
 
   const rotate = rotateValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'], // rotate 180 degrees
+    outputRange: ['0deg', '180deg'],
+  });
+
+  const iconTranslateY = iconTranslateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 20], // Adjust the value as needed for icon's movement
   });
 
   const openRightDrawer = () => {
@@ -149,6 +164,18 @@ const Home = () => {
       console.log('Please Update your Plan');
     }
   };
+  /* _______Deep Search Animation_____ */
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (mode === 'deep_research') {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [mode]);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{flex: 1, backgroundColor: AppColors.gray_700}}>
@@ -160,10 +187,30 @@ const Home = () => {
           leftvisible={leftdrawer}
           leftonClose={openLeftDrawer}>
           <View>
-            <View style={{padding: 10, position: 'absolute', top: 0}}>
+            <View
+              style={{
+                padding: 10,
+                position: 'absolute',
+                top: 0,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '100%',
+              }}>
               <Pressable onPress={openLeftDrawer}>
                 <FontAwesome6 name="bars-staggered" size={24} color="white" />
               </Pressable>
+              {mode === 'deep_research' && (
+                <Animated.View style={{opacity: fadeAnim}}>
+                  <Pressable onPress={openRightDrawer}>
+                    <MaterialIcons
+                      name="arrow-back-ios"
+                      size={40}
+                      color="white"
+                    />
+                  </Pressable>
+                </Animated.View>
+              )}
             </View>
             <View style={styles.container}>
               {/* Blue Bubble Background */}
@@ -230,7 +277,9 @@ const Home = () => {
                   <View>
                     <Animated.View
                       style={{
+                        transform: [{translateY: slideAnim}],
                         width: 250,
+                        height: 90,
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'flex-end',
@@ -241,7 +290,6 @@ const Home = () => {
                         zIndex: -1,
                         paddingBottom: 10,
                         overflow: 'hidden',
-                        height: animatedHeight,
                         borderColor: AppColors.light_blue_300,
                         borderWidth: 2,
                       }}>
@@ -271,18 +319,23 @@ const Home = () => {
                       </TouchableOpacity>
                     </Animated.View>
 
-                    <TouchableOpacity
-                      onPress={toggleHeight}
-                      style={styles.toggleButton}>
-                      <Animated.View style={{transform: [{rotate}]}}>
-                        {/* <FaChevronLeft width={30} height={30} fill="white" /> */}
+                    <Animated.View
+                      style={{
+                        transform: [
+                          {translateY: iconTranslateY}, // Apply icon's Y translation
+                          {rotate: rotate}, // Apply rotation
+                        ],
+                      }}>
+                      <TouchableOpacity
+                        onPress={toggleSlide}
+                        style={styles.toggleButton}>
                         <Icon
                           name="keyboard-arrow-down"
                           size={60}
                           color="white"
                         />
-                      </Animated.View>
-                    </TouchableOpacity>
+                      </TouchableOpacity>
+                    </Animated.View>
                   </View>
                 </View>
               </View>

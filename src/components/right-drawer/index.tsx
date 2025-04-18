@@ -5,17 +5,18 @@ import {
   Dimensions,
   Pressable,
   Animated,
-} from "react-native";
-import React, { useEffect, useRef } from "react";
-
-const SCREEN_WIDTH = Dimensions.get("window").width;
+} from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import IdeaHubSetting from '../idea-hub-setting';
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Props = {
   visible: boolean;
   onClose?: () => void;
 };
 
-export const RightDrawer = ({ visible, onClose }: Props) => {
+export const RightDrawer = ({visible, onClose}: Props) => {
   const translateX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
 
   useEffect(() => {
@@ -31,17 +32,15 @@ export const RightDrawer = ({ visible, onClose }: Props) => {
       style={[
         styles.drawer,
         {
-          transform: [{ translateX }],
+          transform: [{translateX}],
         },
-      ]}
-    >
+      ]}>
       <Pressable onPress={onClose} style={styles.close}>
-        <Text style={{ color: "#fff" }}>Close</Text>
+        <AntDesign name="close" size={24} color="#fff" />
       </Pressable>
-      <View style={{ padding: 20 }}>
-        <Text style={{ color: "#fff", fontSize: 20 }}>
-          Right Drawer Content
-        </Text>
+
+      <View>
+        <IdeaHubSetting />
       </View>
     </Animated.View>
   );
@@ -49,16 +48,16 @@ export const RightDrawer = ({ visible, onClose }: Props) => {
 
 const styles = StyleSheet.create({
   drawer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
-    height: "100%",
+    height: '100%',
     width: SCREEN_WIDTH,
-    backgroundColor: "#333",
+    backgroundColor: '#000000',
     zIndex: 100,
   },
   close: {
     padding: 16,
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
   },
 });

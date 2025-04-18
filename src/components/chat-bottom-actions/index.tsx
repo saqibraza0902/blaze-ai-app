@@ -7,9 +7,21 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+
 import ToggleSwitch from '../../ui/form/toggle-switch';
 import KnowledgeBased from '../../ui/icons/knowledge-based-icon';
 import {AppColors} from '../../constant/Colors';
+import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
+import {Modals} from '../../utils/enums';
+import {
+  setConvoSettings,
+  setFocus,
+  setFocusNull,
+  setModal,
+} from '../../redux/slices/modal';
+import FocusModeIcon from '../../ui/icons/focus-mode';
+import {FOCUS_MODES} from '../../mock';
+import {background} from 'native-base/lib/typescript/theme/styled-system';
 
 // import { useAppDispatch, useAppSelector } from "@/hooks/Hooks";
 // import {
@@ -37,109 +49,93 @@ const BottomActions = ({
   vectorOpen,
   openTopDrawer,
 }: SwitchBarProps) => {
-  //   const { modal, focus, conversation_setting, token } = useAppSelector(
-  //     (state: any) => state.modal
-  //   );
-  //   const { user } = useAppSelector((state: any) => state.user);
-  //   const dispatch = useAppDispatch();
-  //   const mode = conversation_setting?.mode;
+  const {modal, focus, conversation_setting, token} = useAppSelector(
+    (state: any) => state.modal,
+  );
+  const {user} = useAppSelector((state: any) => state.user);
+  const dispatch = useAppDispatch();
+  const mode = conversation_setting?.mode;
 
-  //   const isLoggedIn = !!token;
-  //   const freeuser = user?.planConnections[0]?.type === "FREE";
+  // const isLoggedIn = !!token;
+  // const freeuser = user?.planConnections[0]?.type === 'FREE';
+  let isLoggedIn = true;
+  let freeuser = false;
+  const handleToggle = () => {
+    if (isLoggedIn && !freeuser) {
+      const setModel =
+        modal === Modals.BlazeMax ? Modals.Blaze : Modals.BlazeMax;
+      dispatch(setConvoSettings({key: 'mode', value: 'normal'}));
+      dispatch(setModal(setModel));
 
-  //   const handleToggle = () => {
-  //     if (isLoggedIn && !freeuser) {
-  //       const setModel =
-  //         modal === Modals.BlazeMax ? Modals.Blaze : Modals.BlazeMax;
-  //       dispatch(setConvoSettings({ key: "mode", value: "normal" }));
-  //       dispatch(setModal(setModel));
+      if (setModel === Modals.Blaze) {
+        dispatch(setFocusNull());
+      }
+    } else {
+      // toast.show({ type: "error", text1: "Please update your plan" });
+      console.log('Please update your plan');
+    }
+  };
 
-  //       if (setModel === Modals.Blaze) {
-  //         dispatch(setFocusNull());
-  //       }
-  //     } else {
-  //       toast.show({ type: "error", text1: "Please update your plan" });
-  //     }
-  //   };
+  const SelectedItemHandle = (itm: any) => {
+    dispatch(setFocus(itm.value));
+  };
 
-  //   const SelectedItemHandle = (itm: any) => {
-  //     dispatch(setFocus(itm.value));
-  //   };
+  const handleKnowledgeBase = () => {
+    if (isLoggedIn && !freeuser) {
+      if (modal === Modals.BlazeMax) {
+        vectorOpen();
+      } else {
+        // toast.show({ type: "error", text1: "Please turn on Blaze Max" });
 
-  //   const handleKnowledgeBase = () => {
-  //     if (isLoggedIn && !freeuser) {
-  //       if (modal === Modals.BlazeMax) {
-  //         vectorOpen();
-  //       } else {
-  //         toast.show({ type: "error", text1: "Please turn on Blaze Max" });
-  //       }
-  //     } else {
-  //       toast.show({ type: "error", text1: "Please update your plan" });
-  //     }
-  //   };
+        console.log('Please turn on Blaze Max');
+      }
+    } else {
+      // toast.show({ type: "error", text1: "Please update your plan" });
+      console.log('Please update your plan');
+    }
+  };
 
-  //   const FocusMenu = () => {
-  //     const focusPoint = FOCUS_MODES.find((itm: any) => itm.value === focus);
+  const FocusMenu = () => {
+    const focusPoint = FOCUS_MODES.find((itm: any) => itm.value === focus);
 
-  //     return (
-  //       <View style={styles.focusMenu}>
-  //         {focusPoint ? (
-  //           <focusPoint.icon
-  //             height={30}
-  //             width={30}
-  //             color={modal === Modals.BlazeMax ? "#68BEBF" : "#000"}
-  //           />
-  //         ) : (
-  //           <FocusModeIcon height={30} width={30} color="#000" />
-  //         )}
-  //         <Text style={styles.focusLabel}>
-  //           {focusPoint ? focusPoint.Label : "Focus"}
-  //         </Text>
-  //       </View>
-  //     );
-  //   };
-
+    return (
+      <View style={styles.focusMenu}>
+        {focusPoint ? (
+          <focusPoint.icon
+            // style={{width: 25, height: 25}}
+            fill={modal === Modals.BlazeMax ? '#68BEBF' : '#000'}
+          />
+        ) : (
+          <FocusModeIcon
+            style={{width: 25, height: 25}}
+            fill={modal === Modals.BlazeMax ? '#68BEBF' : '#000'}
+          />
+        )}
+        <Text style={styles.focusLabel}>
+          {focusPoint ? focusPoint.Label : 'Focus'}
+        </Text>
+      </View>
+    );
+  };
+  console.log('modal', modal);
   return (
     <View style={styles.container}>
       <View style={[styles.row, {justifyContent: justify}]}>
         {/* Left Section */}
         <View style={styles.leftSection}>
-          <View style={styles.toggleContainer}>
-            <ToggleSwitch />
+          <View style={[styles.toggleContainer]}>
+            <ToggleSwitch
+              onToggle={handleToggle}
+              initialValue={modal === Modals.BlazeMax ? true : false}
+            />
             <Text style={styles.label}>Blaze Max</Text>
           </View>
-
-          {/* <ScrollView horizontal style={styles.focusScroll}>
-            {FOCUS_MODES.map((itm: any, idx: number) => (
-              <TouchableOpacity
-                key={idx}
-                style={[
-                  styles.focusItem,
-                  focus === itm.value && styles.focusItemActive,
-                ]}
-                onPress={() => SelectedItemHandle(itm)}
-              >
-                <itm.icon
-                  height={24}
-                  width={24}
-                  color={focus === itm.value ? "black" : "white"}
-                />
-                <Text
-                  style={[
-                    styles.focusText,
-                    focus === itm.value && styles.focusTextActive,
-                  ]}
-                >
-                  {itm.Label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView> */}
+          <FocusMenu />
         </View>
 
         {/* Right Section */}
         <TouchableOpacity
-          onPress={openTopDrawer}
+          onPress={handleKnowledgeBase}
           style={styles.kbContainer}
           //   onPress={handleKnowledgeBase}
         >
@@ -148,7 +144,10 @@ const BottomActions = ({
             width={40}
             color={modal === Modals.BlazeMax ? "#68BEBF" : "#000"}
           /> */}
-          <KnowledgeBased style={{ width: 30, height: 30 }} fill={"white"} />
+          <KnowledgeBased
+            style={{width: 30, height: 30}}
+            fill={modal === Modals.BlazeMax ? '#68BEBF' : 'white'}
+          />
           {/* <Text style={styles.kbLabel}>Knowledge Base</Text> */}
         </TouchableOpacity>
       </View>
@@ -167,7 +166,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   leftSection: {
-    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
     paddingRight: 10,
   },
   toggleContainer: {
@@ -175,8 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 14,
-    marginRight: 0,
+    fontSize: 12,
   },
   focusScroll: {
     flexDirection: 'row',
@@ -203,8 +202,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   focusLabel: {
-    marginLeft: 8,
-    fontSize: 14,
+    marginLeft: 3,
+    fontSize: 12,
     color: '#000',
   },
   kbContainer: {
