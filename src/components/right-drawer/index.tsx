@@ -39,7 +39,7 @@ export const RightDrawer = ({visible, onClose}: Props) => {
         <AntDesign name="close" size={24} color="#fff" />
       </Pressable>
 
-      <View>
+      <View style={{marginTop: -45}}>
         <IdeaHubSetting />
       </View>
     </Animated.View>
@@ -59,5 +59,6 @@ const styles = StyleSheet.create({
   close: {
     padding: 16,
     alignItems: 'flex-end',
+    zIndex: 100,
   },
 });

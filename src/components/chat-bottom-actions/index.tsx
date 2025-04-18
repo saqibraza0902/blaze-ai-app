@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
 
 import ToggleSwitch from '../../ui/form/toggle-switch';
@@ -21,7 +23,6 @@ import {
 } from '../../redux/slices/modal';
 import FocusModeIcon from '../../ui/icons/focus-mode';
 import {FOCUS_MODES} from '../../mock';
-import {background} from 'native-base/lib/typescript/theme/styled-system';
 
 // import { useAppDispatch, useAppSelector } from "@/hooks/Hooks";
 // import {
@@ -55,7 +56,7 @@ const BottomActions = ({
   const {user} = useAppSelector((state: any) => state.user);
   const dispatch = useAppDispatch();
   const mode = conversation_setting?.mode;
-
+  const [visible, setVisible] = useState(false);
   // const isLoggedIn = !!token;
   // const freeuser = user?.planConnections[0]?.type === 'FREE';
   let isLoggedIn = true;
@@ -71,7 +72,6 @@ const BottomActions = ({
         dispatch(setFocusNull());
       }
     } else {
-      // toast.show({ type: "error", text1: "Please update your plan" });
       console.log('Please update your plan');
     }
   };
@@ -85,12 +85,9 @@ const BottomActions = ({
       if (modal === Modals.BlazeMax) {
         vectorOpen();
       } else {
-        // toast.show({ type: "error", text1: "Please turn on Blaze Max" });
-
         console.log('Please turn on Blaze Max');
       }
     } else {
-      // toast.show({ type: "error", text1: "Please update your plan" });
       console.log('Please update your plan');
     }
   };
@@ -99,7 +96,7 @@ const BottomActions = ({
     const focusPoint = FOCUS_MODES.find((itm: any) => itm.value === focus);
 
     return (
-      <View style={styles.focusMenu}>
+      <Pressable onPress={() => setVisible(true)} style={styles.focusMenu}>
         {focusPoint ? (
           <focusPoint.icon
             // style={{width: 25, height: 25}}
@@ -114,7 +111,7 @@ const BottomActions = ({
         <Text style={styles.focusLabel}>
           {focusPoint ? focusPoint.Label : 'Focus'}
         </Text>
-      </View>
+      </Pressable>
     );
   };
   console.log('modal', modal);
@@ -131,6 +128,19 @@ const BottomActions = ({
             <Text style={styles.label}>Blaze Max</Text>
           </View>
           <FocusMenu />
+        </View>
+        <View>
+          <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setVisible(false)}>
+            <View>
+              <Pressable onPress={() => setVisible(false)}>
+                <Text>Close</Text>
+              </Pressable>
+            </View>
+          </Modal>
         </View>
 
         {/* Right Section */}
