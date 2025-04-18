@@ -96,13 +96,15 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
               <ScrollView
                 style={[styles.scrollContent, {maxHeight: height}]}
                 nestedScrollEnabled>
-                {folders.map((folder: IFolder) => (
-                  <FolderItem
-                    accordionOpen={accordionOpen}
-                    folder={folder}
-                    setAccordionOpen={setAccordionOpen}
-                    onClose={onClose}
-                  />
+                {folders.map((folder: IFolder, idx: number) => (
+                  <View key={idx}>
+                    <FolderItem
+                      accordionOpen={accordionOpen}
+                      folder={folder}
+                      setAccordionOpen={setAccordionOpen}
+                      onClose={onClose}
+                    />
+                  </View>
                 ))}
               </ScrollView>
             </View>
@@ -142,12 +144,14 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
                   return (
                     <View key={groupKey} style={styles.groupContainer}>
                       <Text style={styles.groupTitle}>{groupLabel}</Text>
-                      {convos.map(item => (
-                        <ConversationItem
-                          key={item.conversation_id}
-                          props={{convo: item, id: item.conversation_id}}
-                          // onClose={onClose}
-                        />
+                      {convos.map((item, idx) => (
+                        <View key={idx}>
+                          <ConversationItem
+                            key={item.conversation_id}
+                            props={{convo: item, id: item.conversation_id}}
+                            // onClose={onClose}
+                          />
+                        </View>
                       ))}
                     </View>
                   );

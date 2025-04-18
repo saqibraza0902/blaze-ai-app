@@ -16,6 +16,8 @@ import {AppColors} from '../../constant/Colors';
 import Icon from 'react-native-vector-icons/AntDesign';
 //@ts-ignore
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import {useAppSelector} from '../../hooks/useRedux';
+import {Modals} from '../../utils/enums';
 interface IProp {
   onChange?: (e: any) => void;
   clearFile?: (e: any) => void;
@@ -37,7 +39,7 @@ const Form = ({
   InputMaxheight,
   clearFile,
 }: IProp) => {
-  //   const { convo_users } = useAppSelector((s) => s.convo);
+  const {modal} = useAppSelector((state: any) => state.modal);
 
   return (
     <View style={styles.container}>
@@ -55,7 +57,11 @@ const Form = ({
 
       <View style={styles.form}>
         <Pressable>
-          <IoniconsIcon name="attach" size={28} color="black" />
+          <IoniconsIcon
+            name="attach"
+            size={28}
+            color={modal === Modals.BlazeMax ? 'black' : 'gray'}
+          />
         </Pressable>
         <TextInput
           style={[
