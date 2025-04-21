@@ -24,7 +24,7 @@ import {
 } from '../../redux/slices/modal';
 import FocusModeIcon from '../../ui/icons/focus-mode';
 import {FOCUS_MODES} from '../../mock';
-import {background} from 'native-base/lib/typescript/theme/styled-system';
+// import {background} from 'native-base/lib/typescript/theme/styled-system';
 
 // import { useAppDispatch, useAppSelector } from "@/hooks/Hooks";
 // import {
@@ -65,6 +65,7 @@ const BottomActions = ({
   let isLoggedIn = true;
   let freeuser = false;
   const handleToggle = () => {
+    console.log('Working...');
     if (isLoggedIn && !freeuser) {
       const setModel =
         modal === Modals.BlazeMax ? Modals.Blaze : Modals.BlazeMax;

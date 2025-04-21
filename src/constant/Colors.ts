@@ -13,6 +13,8 @@ export const Colors = {
     screenbg: '#F3F1F1',
     settingscardbg: '#fff',
     dropdownbg: '#D8D8D9',
+    popoverbg: '#4A4B4C',
+
   },
   dark: {
     text: '#fff',
@@ -20,6 +22,8 @@ export const Colors = {
     screenbg: '#2A2B2C',
     settingscardbg: '#4A4B4C',
     dropdownbg: '#1E1E1E',
+    popoverbg: '#4A4B4C',
+
   },
 };
 export const AppColors = {

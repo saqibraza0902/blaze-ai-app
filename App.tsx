@@ -4,18 +4,19 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import {NavigationContainer} from '@react-navigation/native';
 import LoginScreen from './src/screens/login';
-import Home from './src/screens/home';
+import Home from './src/provider/custom-drawer-provider';
 import ReduxProvider from './src/provider/redux-provider';
 import {get, save} from './src/utils/theme-storage';
 import ThemeProvider from './src/provider/theme-provider';
+import {MenuProvider} from 'react-native-popup-menu';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
   const StackNavigator = () => {
     return (
       <Stack.Navigator
-        initialRouteName="Home"
-        screenOptions={{headerShown: false}}>
+        screenOptions={{headerShown: false}}
+        initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="login" component={LoginScreen} />
       </Stack.Navigator>
@@ -25,10 +26,12 @@ const App = () => {
   return (
     <ReduxProvider>
       <ThemeProvider>
-        <NavigationContainer>
-          <StackNavigator />
-          <StatusBar barStyle={'default'} />
-        </NavigationContainer>
+        <MenuProvider>
+          <NavigationContainer>
+            <StackNavigator />
+            <StatusBar barStyle={'default'} />
+          </NavigationContainer>
+        </MenuProvider>
       </ThemeProvider>
     </ReduxProvider>
   );
