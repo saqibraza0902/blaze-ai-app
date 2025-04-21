@@ -200,7 +200,11 @@ const Home = () => {
                 width: '100%',
               }}>
               <Pressable onPress={openLeftDrawer}>
-                <FontAwesome6 name="bars-staggered" size={24} color="white" />
+                <FontAwesome6
+                  name="bars-staggered"
+                  size={24}
+                  color={theme === 'dark' ? 'white' : '#2A2B2C'}
+                />
               </Pressable>
               {mode === 'deep_research' && (
                 <Animated.View style={{opacity: fadeAnim}}>
@@ -208,7 +212,7 @@ const Home = () => {
                     <MaterialIcons
                       name="arrow-back-ios"
                       size={40}
-                      color="white"
+                      color={theme === 'dark' ? 'white' : '#2A2B2C'}
                     />
                   </Pressable>
                 </Animated.View>
@@ -334,7 +338,7 @@ const Home = () => {
                         <Icon
                           name="keyboard-arrow-down"
                           size={60}
-                          color="white"
+                          color={theme === 'dark' ? 'white' : '#2A2B2C'}
                         />
                       </TouchableOpacity>
                     </Animated.View>

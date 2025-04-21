@@ -1,6 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
+import {useAppSelector} from '../../hooks/useRedux';
+import {Colors} from '../../constant/Colors';
 
 interface CustomPickerProps<T> {
   data: T[];
@@ -23,6 +25,8 @@ const CustomPicker = <T,>({
   dropdownStyle,
   defaultButtonText,
 }: CustomPickerProps<T>) => {
+  const {theme} = useAppSelector(s => s.theme);
+  const Theme_colors = Colors[theme];
   return (
     <SelectDropdown
       data={data}
@@ -31,8 +35,14 @@ const CustomPicker = <T,>({
       buttonTextAfterSelection={buttonTextAfterSelection}
       rowTextForSelection={rowTextForSelection}
       renderButton={(selectedItem, isOpened) => (
-        <View style={[styles.dropdownButtonStyle, buttonStyle]}>
-          <Text style={styles.dropdownButtonTxtStyle}>
+        <View
+          style={[
+            styles.dropdownButtonStyle,
+            buttonStyle,
+            {backgroundColor: Theme_colors.dropdownbg},
+          ]}>
+          <Text
+            style={[styles.dropdownButtonTxtStyle, {color: Theme_colors.text}]}>
             {(selectedItem && buttonTextAfterSelection?.(selectedItem)) ||
               defaultButtonText}
           </Text>
@@ -44,14 +54,18 @@ const CustomPicker = <T,>({
             ...styles.dropdownItemStyle,
             ...(isSelected && {backgroundColor: '#68BEBF'}),
           }}>
-          <Text style={styles.dropdownItemTxtStyle}>
+          <Text
+            style={[styles.dropdownItemTxtStyle, {color: Theme_colors.text}]}>
             {rowTextForSelection(item)}
           </Text>
         </View>
       )}
       showsVerticalScrollIndicator={false}
-      dropdownStyle={dropdownStyle}
-      rowStyle={styles.dropdownItemStyle}
+      dropdownStyle={{
+        backgroundColor: Theme_colors.dropdownbg,
+        borderRadius: 15,
+      }}
+      rowStyle={[styles.dropdownItemStyle]}
       rowTextStyle={styles.dropdownItemTxtStyle}
       buttonStyle={buttonStyle}
       buttonTextStyle={buttonTextStyle}
@@ -73,19 +87,17 @@ const styles = StyleSheet.create({
   dropdownButtonTxtStyle: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'white',
   },
   dropdownItemStyle: {
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 8,
-    backgroundColor: '#1E1E1E',
+    borderRadius: 10,
   },
   dropdownItemTxtStyle: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'white',
   },
 });
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Modal,
+  Pressable,
+  Dimensions,
 } from 'react-native';
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import ToggleSwitch from '../../ui/form/toggle-switch';
 import KnowledgeBased from '../../ui/icons/knowledge-based-icon';
 import {AppColors} from '../../constant/Colors';
@@ -55,7 +58,8 @@ const BottomActions = ({
   const {user} = useAppSelector((state: any) => state.user);
   const dispatch = useAppDispatch();
   const mode = conversation_setting?.mode;
-
+  const [showmenu, setShowMenu] = useState(false);
+  const {width} = Dimensions.get('window');
   // const isLoggedIn = !!token;
   // const freeuser = user?.planConnections[0]?.type === 'FREE';
   let isLoggedIn = true;
@@ -83,7 +87,7 @@ const BottomActions = ({
   const handleKnowledgeBase = () => {
     if (isLoggedIn && !freeuser) {
       if (modal === Modals.BlazeMax) {
-        vectorOpen();
+        openTopDrawer && openTopDrawer();
       } else {
         // toast.show({ type: "error", text1: "Please turn on Blaze Max" });
 
@@ -94,15 +98,19 @@ const BottomActions = ({
       console.log('Please update your plan');
     }
   };
-
+  const Show_Focus_Model = () => {
+    if (modal === Modals.BlazeMax) {
+      setShowMenu(true);
+    }
+  };
   const FocusMenu = () => {
     const focusPoint = FOCUS_MODES.find((itm: any) => itm.value === focus);
 
     return (
-      <View style={styles.focusMenu}>
+      <Pressable onPress={Show_Focus_Model} style={styles.focusMenu}>
         {focusPoint ? (
           <focusPoint.icon
-            // style={{width: 25, height: 25}}
+            style={{width: 25, height: 25}}
             fill={modal === Modals.BlazeMax ? '#68BEBF' : '#000'}
           />
         ) : (
@@ -114,10 +122,10 @@ const BottomActions = ({
         <Text style={styles.focusLabel}>
           {focusPoint ? focusPoint.Label : 'Focus'}
         </Text>
-      </View>
+      </Pressable>
     );
   };
-  console.log('modal', modal);
+
   return (
     <View style={styles.container}>
       <View style={[styles.row, {justifyContent: justify}]}>
@@ -131,6 +139,69 @@ const BottomActions = ({
             <Text style={styles.label}>Blaze Max</Text>
           </View>
           <FocusMenu />
+          <Modal
+            visible={showmenu}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setShowMenu(false)}>
+            <View style={styles.modalOverlay}>
+              <Pressable
+                onPress={() => setShowMenu(false)}
+                style={styles.close}>
+                <AntDesign name="close" size={24} color={'white'} />
+              </Pressable>
+              <View
+                style={[
+                  styles.modalContent,
+                  {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 6,
+                  },
+                ]}>
+                {FOCUS_MODES.map((itm, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[
+                      styles.focusItem,
+                      focus === itm.value && styles.focusItemActive,
+                      {width: width / 2 - 48},
+                    ]}
+                    onPress={() => {
+                      SelectedItemHandle(itm);
+                      setShowMenu(false);
+                    }}>
+                    <View>
+                      <View
+                        style={{display: 'flex', flexDirection: 'row', gap: 4}}>
+                        <itm.icon
+                          style={{width: 25, height: 25}}
+                          fill={focus === itm.value ? '#000' : '#fff'}
+                        />
+
+                        <Text
+                          style={[
+                            styles.focusText,
+                            focus === itm.value && styles.focusTextActive,
+                          ]}>
+                          {itm.Label}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          color: focus === itm.value ? '#000' : '#fff',
+                          fontSize: 12,
+                          marginTop: 6,
+                        }}>
+                        {itm.des}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </Modal>
         </View>
 
         {/* Right Section */}
@@ -216,5 +287,24 @@ const styles = StyleSheet.create({
   kbLabel: {
     fontSize: 12,
     color: '#000',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)', // optional for dim effect
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+  },
+  modalContent: {
+    backgroundColor: '#121212',
+    width: '100%',
+    padding: 20,
+    borderRadius: 10,
+  },
+  close: {
+    padding: 16,
+    width: 60,
+
+    zIndex: 100,
   },
 });
