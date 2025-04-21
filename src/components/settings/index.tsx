@@ -16,6 +16,10 @@ import {useNavigation} from '@react-navigation/native';
 import {setConvoNull, setLogout} from '../../redux/slices/conversation';
 import {setModal, setTokenNull} from '../../redux/slices/modal';
 import {setUser} from '../../redux/slices/user';
+import {get, save} from '../../utils/theme-storage';
+import {setTheme} from '../../redux/slices/theme';
+import {Colors} from '../../constant/Colors';
+// import {useAppTheme} from '../../provider/theme-provider';
 
 interface SettingsProps {
   openFeedback: () => void;
@@ -32,7 +36,11 @@ const Settings = ({
     user: s.user.user,
     token: s.modal.token,
   }));
-  const {colors, dark} = useTheme();
+  const {theme} = useAppSelector(s => s.theme);
+  // const { toggleTheme } = useAppTheme();
+  const colors = Colors[theme];
+
+  // const {colors, dark} = useTheme();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [showMenu, setShowMenu] = useState(false);
@@ -43,29 +51,15 @@ const Settings = ({
   });
 
   const handleLogout = () => {
-    // Implement your logout logic here
-    // memberstack?.logout();
-    // localStorage.removeItem("_ms-mem");
     dispatch(setConvoNull());
     dispatch(setLogout());
     dispatch(setTokenNull());
     dispatch(setUser(null));
-    // localStorage.removeItem("focus");
-    // localStorage.removeItem("token");
-    // localStorage.removeItem("modal");
     onClose?.();
   };
 
   const clickhere = async () => {
     try {
-      // await memberstack?.launchStripeCustomerPortal({
-      //   configuration: {
-      //     invoice_history: {
-      //       enabled: true,
-      //     },
-      //   },
-      // });
-      // navigation.navigate('Billing');
       onClose?.();
     } catch (error) {
       console.error(error);
@@ -73,7 +67,6 @@ const Settings = ({
   };
 
   useEffect(() => {
-    // Mock API call to get feedback stats
     const get_stats = async () => {
       try {
         // const res = await get_feedback(token);
@@ -96,14 +89,18 @@ const Settings = ({
     (feedbackData.conversation_count > 20 &&
       feedbackData.message_count > 50 &&
       feedbackData.feedback_count < 2);
-
+  const toggleTheme = async () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    dispatch(setTheme(newTheme));
+  };
   const baseOptions = [
     {
       text: 'Switch Theme',
       icon: 'color-palette',
       action: () => {
         // setTheme(theme === "dark" ? "light" : "dark");
-        onClose?.();
+        toggleTheme();
+        // onClose?.();
       },
     },
     {
@@ -202,7 +199,7 @@ const Settings = ({
             style={[
               styles.menuContainer,
               {
-                backgroundColor: colors.card,
+                backgroundColor: colors.settingscardbg,
                 shadowColor: colors.text,
               },
             ]}>
@@ -289,11 +286,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
-    paddingBottom: 20,
+    paddingBottom: 90,
   },
   menuContainer: {
     maxHeight: '60%',
-    borderTopLeftRadius: 16,
+    borderRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
     shadowOffset: {

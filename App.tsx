@@ -1,11 +1,13 @@
-import {StatusBar, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {StatusBar, StyleSheet, Text, useColorScheme, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import {NavigationContainer} from '@react-navigation/native';
 import LoginScreen from './src/screens/login';
 import Home from './src/screens/home';
 import ReduxProvider from './src/provider/redux-provider';
+import {get, save} from './src/utils/theme-storage';
+import ThemeProvider from './src/provider/theme-provider';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
@@ -17,12 +19,15 @@ const App = () => {
       </Stack.Navigator>
     );
   };
+
   return (
     <ReduxProvider>
-      <NavigationContainer>
-        <StackNavigator />
-        <StatusBar barStyle={'default'} />
-      </NavigationContainer>
+      <ThemeProvider>
+        <NavigationContainer>
+          <StackNavigator />
+          <StatusBar barStyle={'default'} />
+        </NavigationContainer>
+      </ThemeProvider>
     </ReduxProvider>
   );
 };

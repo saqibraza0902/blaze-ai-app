@@ -5,12 +5,15 @@
 
 import {Colors} from '../constant/Colors';
 import {useColorScheme} from './useColorScheme';
+import {useAppSelector} from './useRedux';
 
 export function useThemeColor(
   props: {light?: string; dark?: string},
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
 ) {
-  const theme = useColorScheme() ?? 'light';
+  // const theme = useColorScheme() ?? 'light';
+  const {theme} = useAppSelector(s => s.theme);
+  console.log('My theme', theme);
   const colorFromProps = props[theme];
 
   if (colorFromProps) {

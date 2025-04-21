@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   UIManager,
   Platform,
   ScrollView,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import {IFolder, IConversations} from '../../../utils/types';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -16,6 +18,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {useTheme} from '@react-navigation/native';
 import {useAppSelector} from '../../../hooks/useRedux';
 import ConversationItem from '../../list-conversations/conversation-item';
+import {Colors} from '../../../constant/Colors';
 
 // Enable LayoutAnimation on Android
 if (
@@ -32,6 +35,10 @@ interface IFolderItemProps {
   onClose?: () => void;
 }
 
+const CONVERSATION_ITEM_HEIGHT = 60; // Adjust this based on your ConversationItem height
+const EMPTY_STATE_HEIGHT = 50; // Height for "No conversations" text
+const MAX_ACCORDION_HEIGHT = Dimensions.get('window').height * 0.6; // Max height (60% of screen)
+
 const FolderItem = ({
   folder,
   accordionOpen,
@@ -39,33 +46,48 @@ const FolderItem = ({
   onClose,
 }: IFolderItemProps) => {
   const {conversations} = useAppSelector(s => s.convo);
-  const {colors, dark} = useTheme();
+  // const {colors, dark} = useTheme();
+  const {theme} = useAppSelector(s => s.theme);
   const [showActions, setShowActions] = useState(false);
+  const animation = useRef(new Animated.Value(0)).current;
 
   const isOpen = accordionOpen === folder.id;
+  const filteredConvos = conversations?.filter(
+    (convo: IConversations) => convo.folder_id === folder.id,
+  );
+
+  // Calculate the height needed based on conversation count
+  const calculateContentHeight = () => {
+    if (!filteredConvos || filteredConvos.length === 0) {
+      return EMPTY_STATE_HEIGHT;
+    }
+    return Math.min(
+      filteredConvos.length * CONVERSATION_ITEM_HEIGHT,
+      MAX_ACCORDION_HEIGHT,
+    );
+  };
+
+  useEffect(() => {
+    const height = calculateContentHeight();
+    Animated.timing(animation, {
+      toValue: isOpen ? height : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isOpen, filteredConvos?.length]);
 
   const handleToggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setAccordionOpen(isOpen ? null : folder.id);
   };
-
-  const filteredConvos = conversations?.filter(
-    (convo: IConversations) => convo.folder_id === folder.id,
-  );
-
+  const colors = Colors[theme];
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity
-        style={styles.header}
-        onPress={handleToggle}
-        activeOpacity={0.7}>
+      <TouchableOpacity style={styles.header} onPress={handleToggle}>
         <View style={styles.folderInfo}>
           <View style={[styles.colorDot, {backgroundColor: folder.color}]} />
           <Text style={[styles.folderName, {color: colors.text}]}>
             {folder.name}
-          </Text>
-          <Text style={[styles.countText, {color: colors.text}]}>
-            ({filteredConvos?.length || 0})
           </Text>
         </View>
 
@@ -84,12 +106,11 @@ const FolderItem = ({
         </View>
       </TouchableOpacity>
 
-      {showActions && (
+      {/* {showActions && (
         <View style={[styles.actionsMenu, {backgroundColor: colors.card}]}>
           <TouchableOpacity
             style={styles.actionItem}
             onPress={() => {
-              // editOpen(folder);
               onClose?.();
               setShowActions(false);
             }}>
@@ -100,7 +121,6 @@ const FolderItem = ({
           <TouchableOpacity
             style={styles.actionItem}
             onPress={() => {
-              // folderDelDialouge(folder.id);
               onClose?.();
               setShowActions(false);
             }}>
@@ -111,7 +131,6 @@ const FolderItem = ({
           <TouchableOpacity
             style={styles.actionItem}
             onPress={() => {
-              // sharedUsers(folder, null);
               onClose?.();
               setShowActions(false);
             }}>
@@ -119,34 +138,40 @@ const FolderItem = ({
             <Text style={[styles.actionText, {color: colors.text}]}>Share</Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
 
-      {isOpen && (
-        <View style={styles.accordionContent}>
-          {filteredConvos?.length === 0 ? (
-            <Text style={[styles.emptyText, {color: colors.text}]}>
-              No conversations in this folder
-            </Text>
-          ) : (
-            <ScrollView style={styles.conversationList} nestedScrollEnabled>
-              {filteredConvos?.map((convo: IConversations) => (
-                <ConversationItem
-                  key={convo.conversation_id}
-                  props={{convo: convo, id: convo.conversation_id}}
-                  // onClose={onClose}
-                />
-              ))}
-            </ScrollView>
-          )}
-        </View>
-      )}
+      <Animated.View
+        style={[
+          styles.accordionContent,
+          {
+            height: animation,
+
+            borderRadius: 8,
+            marginTop: 4,
+          },
+        ]}>
+        {filteredConvos?.length === 0 ? (
+          <Text style={[styles.emptyText, {color: colors.text}]}>
+            No conversations
+          </Text>
+        ) : (
+          <ScrollView style={styles.conversationList} nestedScrollEnabled>
+            {filteredConvos?.map((convo: IConversations) => (
+              <ConversationItem
+                key={convo.conversation_id}
+                props={{convo: convo, id: convo.conversation_id}}
+              />
+            ))}
+          </ScrollView>
+        )}
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 12,
+    // marginBottom: 12,
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -156,7 +181,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   folderInfo: {
     flexDirection: 'row',
@@ -174,23 +198,25 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flexShrink: 1,
   },
-  countText: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   menuButton: {
-    padding: 4,
+    marginLeft: 8,
   },
   actionsMenu: {
+    position: 'absolute',
+    right: 16,
+    top: 50,
+    zIndex: 10,
     paddingVertical: 8,
     borderRadius: 4,
     elevation: 2,
-    marginHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   actionItem: {
     flexDirection: 'row',
@@ -203,8 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   accordionContent: {
-    marginTop: 4,
-    maxHeight: 300,
+    overflow: 'hidden',
   },
   conversationList: {
     paddingHorizontal: 8,
