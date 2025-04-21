@@ -16,6 +16,9 @@ const ThemeProvider = ({children}: {children: React.ReactNode}) => {
         console.log('This is saved theme', mytheme);
         if (savedTheme === 'light' || savedTheme === 'dark') {
           dispatch(setTheme(savedTheme));
+        }else{
+          const savedTheme = "light"
+          dispatch(setTheme(savedTheme));
         }
       } catch (error) {
         console.error('Failed to load theme', error);

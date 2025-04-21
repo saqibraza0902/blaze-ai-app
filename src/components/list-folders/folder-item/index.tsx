@@ -10,6 +10,8 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  Modal,
+  Pressable,
 } from 'react-native';
 import {IFolder, IConversations} from '../../../utils/types';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -32,7 +34,9 @@ interface IFolderItemProps {
   folder: IFolder;
   accordionOpen: number | null;
   setAccordionOpen: (id: number | null) => void;
-  onClose?: () => void;
+  onClose: () => void;
+  handleOpenMenu?: () => void;
+  handleDelFol: (id: number) => void;
 }
 
 const CONVERSATION_ITEM_HEIGHT = 60; // Adjust this based on your ConversationItem height
@@ -44,8 +48,11 @@ const FolderItem = ({
   accordionOpen,
   setAccordionOpen,
   onClose,
+  handleOpenMenu,
+  handleDelFol,
 }: IFolderItemProps) => {
   const {conversations} = useAppSelector(s => s.convo);
+  const [folderMenu, setFolderMenu] = useState(false);
   // const {colors, dark} = useTheme();
   const {theme} = useAppSelector(s => s.theme);
   const [showActions, setShowActions] = useState(false);
@@ -97,12 +104,49 @@ const FolderItem = ({
             size={24}
             color={colors.text}
           />
-
-          <TouchableOpacity
-            onPress={() => setShowActions(!showActions)}
+          <Modal
+            visible={folderMenu}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setFolderMenu(false)}>
+            <Pressable
+              style={styles.modalOverlay}
+              onPress={() => setFolderMenu(false)}>
+              <View
+                style={[
+                  styles.menuContainer,
+                  {backgroundColor: colors.popoverbg},
+                ]}>
+                <View style={styles.modalContentView}>
+                  <Text style={{color: '#fff', fontSize: 16}}>Edit Folder</Text>
+                  <FontAwesome name="edit" size={18} color="#fff" />
+                </View>
+                <Pressable
+                  onPress={() => {
+                    handleDelFol(folder.id), onClose();
+                  }}
+                  style={styles.modalContentView}>
+                  <Text style={{color: '#fff', fontSize: 16}}>
+                    Delete Folder
+                  </Text>
+                  <View style={{height: 20, width: 18}}>
+                    <FontAwesome name="trash-o" size={20} color="#fff" />
+                  </View>
+                </Pressable>
+                <View style={styles.modalContentView}>
+                  <Text style={{color: '#fff', fontSize: 16}}>
+                    Shared Users
+                  </Text>
+                  <FontAwesome name="share-square-o" size={18} color="#fff" />
+                </View>
+              </View>
+            </Pressable>
+          </Modal>
+          <Pressable
+            onPress={() => setFolderMenu(true)}
             style={styles.menuButton}>
             <MaterialIcons name="more-vert" size={20} color={colors.text} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </TouchableOpacity>
 
@@ -239,6 +283,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 16,
     opacity: 0.7,
+  },
+  modalOverlay: {
+    flex: 1,
+    // backgroundColor: 'rgba(0,0,0,0.1)',
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
+    padding: 20, // Optional: Add some padding around the modal
+  },
+  menuContainer: {
+    borderRadius: 16,
+    width: '80%',
+    padding: 16,
+    gap: 25,
+    zIndex: 40,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 4,
+    // elevation: 5,
+  },
+  modalContentView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });
 
