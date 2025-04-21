@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import BubbleSubmitBox from '../../components/bubble-submit-box';
-import {AppColors} from '../../constant/Colors';
+import {AppColors, Colors} from '../../constant/Colors';
 import BlueBubbleIcon from '../../ui/icons/blue-bubble-icon/BlueBubbleIcon';
 import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
 import DeepresearchIcon from '../../ui/icons/deep-search-icon';
@@ -50,9 +50,11 @@ const Home = () => {
   const iconTranslateAnim = useRef(new Animated.Value(-3)).current;
   const dispatch = useAppDispatch();
   const {conversation_setting} = useAppSelector(s => s.modal);
+  const {theme} = useAppSelector(s => s.theme);
   const {models, mode} = conversation_setting;
   let freeuser = false;
   let isLoggedIn = true;
+  const colors = Colors[theme];
 
   console.log('mode', mode);
 
@@ -178,7 +180,7 @@ const Home = () => {
   }, [mode]);
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{flex: 1, backgroundColor: AppColors.gray_700}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.screenbg}}>
         <DrawerProvider
           visible={visible}
           onClose={handleClose}

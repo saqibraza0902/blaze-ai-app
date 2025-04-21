@@ -19,6 +19,9 @@ import {IFolder, IConversations} from '../../utils/types';
 import {setNull, setResetConvoUser} from '../../redux/slices/conversation';
 import {useNavigation} from '@react-navigation/native';
 import Settings from '../settings';
+import AddFolderIcon from '../../ui/icons/add-folder-icon';
+import {Colors} from '../../constant/Colors';
+import NewChatIcon from '../../ui/icons/new-chat-icon';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const DRAWER_WIDTH = SCREEN_WIDTH; // 80% of screen width
@@ -32,6 +35,7 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const {conversations, folders} = useAppSelector(s => s.convo);
   const groupedConversations = groupConversationsByTime(conversations);
+  const {theme} = useAppSelector(s => s.theme);
   const dispatch = useAppDispatch();
   const router = useNavigation(); // Assuming you're using react-navigation
 
@@ -55,26 +59,32 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
   //   onClose?.();
   // };
   const isLoggedIn = true;
+  const colors = Colors[theme];
   return (
     <Animated.View
       style={[
         styles.drawer,
         {
+          backgroundColor: colors.drawerbg,
           transform: [{translateX}],
         },
       ]}>
       {/* Close button */}
       <Pressable onPress={onClose} style={styles.close}>
-        <AntDesign name="close" size={24} color="#fff" />
+        <AntDesign
+          name="close"
+          size={24}
+          color={theme === 'dark' ? '#fff' : '#000'}
+        />
       </Pressable>
 
       {/* Logo section */}
       <View style={styles.logoContainer}>
-        {/* <Image
-          source={require('../../assets/blaze-logo.png')}
+        <Image
+          source={require('../../../assets/images/blaze/blaze-logo.png')}
           style={styles.logo}
-        /> */}
-        <Text style={styles.logoText}>BlazeAI</Text>
+        />
+        <Text style={[styles.logoText, {color: colors.text}]}>BlazeAI</Text>
       </View>
 
       {/* Main content */}
@@ -84,12 +94,14 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
             {/* Folders section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Folders</Text>
+                <Text style={[styles.sectionTitle, {color: colors.text}]}>
+                  Folders
+                </Text>
                 <Pressable style={styles.iconButton}>
-                  <MaterialIcons
-                    name="create-new-folder"
-                    size={24}
-                    color="#fff"
+                  <AddFolderIcon
+                    height={24}
+                    width={24}
+                    fill={theme === 'dark' ? '#fff' : '#000'}
                   />
                 </Pressable>
               </View>
@@ -112,9 +124,15 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
             {/* Conversations section */}
             <View style={[styles.section, styles.flex1]}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Chats</Text>
+                <Text style={[styles.sectionTitle, {color: colors.text}]}>
+                  Chats
+                </Text>
                 <Pressable style={styles.iconButton}>
-                  <MaterialIcons name="message" size={24} color="#fff" />
+                  <NewChatIcon
+                    width={24}
+                    height={24}
+                    fill={theme === 'dark' ? '#fff' : '#000'}
+                  />
                 </Pressable>
               </View>
               <ScrollView style={styles.scrollContent} nestedScrollEnabled>
@@ -187,7 +205,7 @@ const styles = StyleSheet.create({
     left: 0,
     height: '100%',
     width: SCREEN_WIDTH,
-    backgroundColor: '#444',
+    // backgroundColor: '#444',
     zIndex: 100,
   },
   close: {
@@ -199,8 +217,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
   },
   logo: {
     width: 40,
@@ -228,8 +244,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
   },
   sectionTitle: {
     color: '#fff',
@@ -261,8 +275,6 @@ const styles = StyleSheet.create({
   },
   settingsContainer: {
     padding: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#333',
   },
   settingsText: {
     color: '#fff',

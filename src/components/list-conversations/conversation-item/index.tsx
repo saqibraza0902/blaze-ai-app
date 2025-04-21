@@ -3,7 +3,8 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {IConversationItem, IConversations} from '../../../utils/types';
 import {ThemedText} from '../../ThemedText';
 import {ThemedView} from '../../ThemedView';
-import {AppColors} from '../../../constant/Colors';
+import {AppColors, Colors} from '../../../constant/Colors';
+import {useAppSelector} from '../../../hooks/useRedux';
 
 interface IConversationItemProp {
   props: {
@@ -14,19 +15,24 @@ interface IConversationItemProp {
 
 const ConversationItem = ({props}: IConversationItemProp) => {
   const {convo, id} = props;
-
+  const {theme} = useAppSelector(s => s.theme);
   const isSelected = convo.conversation_id === id;
-
+  const colors = Colors[theme];
   return (
-    <ThemedView
+    <View
       style={{
-        padding: 5,
-        borderWidth: 1,
-        borderColor: AppColors.gray_200,
-        marginVertical: 10,
+        marginVertical: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        backgroundColor:
+          theme === 'dark'
+            ? 'rgba(255, 255, 255, 0.05)'
+            : 'rgba(0, 0, 0, 0.05)',
       }}>
-      <ThemedText numberOfLines={1}>{convo?.conversation_name}</ThemedText>
-    </ThemedView>
+      <Text style={{color: colors.text}} numberOfLines={1}>
+        {convo?.conversation_name}
+      </Text>
+    </View>
   );
 };
 
