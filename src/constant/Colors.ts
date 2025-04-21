@@ -12,12 +12,14 @@ export const Colors = {
     drawerbg: '#F3F1F1',
     screenbg: '#F3F1F1',
     settingscardbg: '#fff',
+    popoverbg: '#4A4B4C',
   },
   dark: {
     text: '#fff',
     drawerbg: '#0A0A0A',
     screenbg: '#2A2B2C',
     settingscardbg: '#4A4B4C',
+    popoverbg: '#4A4B4C',
   },
 };
 export const AppColors = {

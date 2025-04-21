@@ -35,14 +35,13 @@ import {token} from '../../mock';
 import {setConversation, setFolders} from '../../redux/slices/conversation';
 import {setUser} from '../../redux/slices/user';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {NativeBaseProvider} from 'native-base';
+import HomeLayout from '../../components/logged-screens-layout';
 
-const {width: WIDTH} = Dimensions.get('window');
-
-const Home = () => {
-  const [visible, setVisible] = useState(false);
-  const [topDrawerVisible, setTopDrawerVisible] = useState(false);
-  const [leftdrawer, setLeftDrawer] = useState(false);
+const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
+interface IProp {
+  toggleDrawer: (key: 'left' | 'right' | 'top') => void;
+}
+const Home = ({toggleDrawer}: IProp) => {
   const [expanded, setExpanded] = useState(false);
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const rotateValue = useRef(new Animated.Value(0)).current;
@@ -54,7 +53,6 @@ const Home = () => {
   const {models, mode} = conversation_setting;
   let freeuser = false;
   let isLoggedIn = true;
-  const colors = Colors[theme];
 
   console.log('mode', mode);
 
@@ -111,25 +109,6 @@ const Home = () => {
     outputRange: [0, 20], // Adjust the value as needed for icon's movement
   });
 
-  const openRightDrawer = () => {
-    setVisible(true);
-    setTopDrawerVisible(false); // Close top drawer when opening right drawer
-  };
-
-  const openTopDrawer = () => {
-    setTopDrawerVisible(true);
-    setVisible(false); // Close right drawer when opening top drawer
-  };
-
-  const handleClose = () => {
-    setVisible(false);
-    setTopDrawerVisible(false); // Close both drawers when closing
-  };
-
-  const openLeftDrawer = () => {
-    setLeftDrawer(prevState => !prevState);
-  };
-
   const handleResearchToggle = () => {
     if (isLoggedIn && !freeuser) {
       if (mode === 'deep_research') {
@@ -178,86 +157,75 @@ const Home = () => {
       }).start();
     }
   }, [mode]);
+
+  const colors = Colors[theme];
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.screenbg}}>
-        <DrawerProvider
-          visible={visible}
-          onClose={handleClose}
-          topvisible={topDrawerVisible}
-          toponClose={handleClose}
-          leftvisible={leftdrawer}
-          leftonClose={openLeftDrawer}>
-          <View>
-            <View
-              style={{
-                padding: 10,
-                position: 'absolute',
-                top: 0,
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}>
-              <Pressable onPress={openLeftDrawer}>
-                <FontAwesome6 name="bars-staggered" size={24} color="white" />
-              </Pressable>
-              {mode === 'deep_research' && (
-                <Animated.View style={{opacity: fadeAnim}}>
-                  <Pressable onPress={openRightDrawer}>
-                    <MaterialIcons
-                      name="arrow-back-ios"
-                      size={40}
-                      color="white"
-                    />
-                  </Pressable>
-                </Animated.View>
-              )}
-            </View>
-            <View style={styles.container}>
-              {/* Blue Bubble Background */}
-              <View style={styles.blueBubbleWrapper}>
-                <View style={styles.blueBubble}>
-                  <BlueBubbleIcon />
-                  <View style={styles.overlayContent}>
-                    <View style={styles.avatarWrapper}>
-                      <View style={styles.avatar}>
-                        <Image
-                          source={require('../../../assets/images/blaze/blaze-logo.png')}
-                          style={styles.avatarImage}
-                        />
-                      </View>
-                    </View>
-                    <View style={styles.messageWrapper}>
-                      <Text style={styles.greetingText}>
-                        How can I help you today,
-                        {/* {isLoggedIn && (
-                <Text> Pen Di siri</Text>
-                )} */}
-                      </Text>
-                    </View>
-                  </View>
+    <View style={{height: HEIGHT, backgroundColor: colors.screenbg}}>
+      <View
+        style={{
+          padding: 10,
+          position: 'absolute',
+          top: 0,
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}>
+        <Pressable onPress={() => toggleDrawer('left')}>
+          <FontAwesome6 name="bars-staggered" size={24} color="white" />
+        </Pressable>
+        {mode === 'deep_research' && (
+          <Animated.View style={{opacity: fadeAnim}}>
+            <Pressable onPress={() => toggleDrawer('right')}>
+              <MaterialIcons name="arrow-back-ios" size={40} color="white" />
+            </Pressable>
+          </Animated.View>
+        )}
+      </View>
+      <View style={styles.container}>
+        {/* Blue Bubble Background */}
+        <View style={styles.blueBubbleWrapper}>
+          <View style={styles.blueBubble}>
+            <BlueBubbleIcon />
+            <View style={styles.overlayContent}>
+              <View style={styles.avatarWrapper}>
+                <View style={styles.avatar}>
+                  <Image
+                    source={require('../../../assets/images/blaze/blaze-logo.png')}
+                    style={styles.avatarImage}
+                  />
                 </View>
               </View>
+              <View style={styles.messageWrapper}>
+                <Text style={styles.greetingText}>
+                  How can I help you today,
+                  {/* {isLoggedIn && (
+                <Text> Pen Di siri</Text>
+                )} */}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
-              {/* Gray Bubble */}
-              <View style={styles.grayBubble}>
-                <View style={styles.inputRow}>
-                  <View style={styles.inputBox}>
-                    <BubbleSubmitBox
-                      clearFile={() => {}}
-                      file={null}
-                      handleFileChange={() => {}}
-                      inputValue=""
-                      loading={false}
-                      onChange={() => {}}
-                      onSubmit={() => {}}
-                      vectorOpen={() => {}}
-                      openTopDrawer={openTopDrawer}
-                    />
-                  </View>
-                  <View style={styles.userImageWrapper}>
-                    {/* <Image
+        {/* Gray Bubble */}
+        <View style={styles.grayBubble}>
+          <View style={styles.inputRow}>
+            <View style={styles.inputBox}>
+              <BubbleSubmitBox
+                clearFile={() => {}}
+                file={null}
+                handleFileChange={() => {}}
+                inputValue=""
+                loading={false}
+                onChange={() => {}}
+                onSubmit={() => {}}
+                vectorOpen={() => {}}
+                openTopDrawer={() => toggleDrawer('top')}
+              />
+            </View>
+            <View style={styles.userImageWrapper}>
+              {/* <Image
               style={styles.userImage}
               source={
                 isLoggedIn && user?.profileImage
@@ -265,87 +233,78 @@ const Home = () => {
                   : require("@/assets/usericon.jpg")
               }
             /> */}
-                    <Image
-                      source={{
-                        uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEFlCxAfL-D3y4JVh8rnRPUoQ5pMsbf6cjAg&s',
-                      }}
-                      style={styles.userImage}
-                    />
-                  </View>
-                </View>
-
-                {/* Toggle Options */}
-                <View style={styles.toggleWrapper}>
-                  <View>
-                    <Animated.View
-                      style={{
-                        transform: [{translateY: slideAnim}],
-                        width: 250,
-                        height: 90,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-end',
-                        gap: 10,
-                        backgroundColor: AppColors.gray_200,
-                        padding: 10,
-                        borderRadius: 20,
-                        zIndex: -1,
-                        paddingBottom: 10,
-                        overflow: 'hidden',
-                        borderColor: AppColors.light_blue_300,
-                        borderWidth: 2,
-                      }}>
-                      <TouchableOpacity
-                        style={[
-                          styles.toggleButton,
-                          mode !== 'deep_research'
-                            ? styles.outlined
-                            : styles.filledGray,
-                        ]}
-                        onPress={handleResearchToggle}>
-                        <DeepresearchIcon height={25} width={25} />
-                        <Text style={styles.toggleText}>I.D.E.A Hub</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.toggleButton,
-                          mode === 'deep_dive'
-                            ? styles.filledGray
-                            : styles.outlined,
-                        ]}
-                        onPress={handleDeepDiveToggle}>
-                        <AntDesign name="search1" size={20} color={'black'} />
-                        {/* <EvilIcons name="search" size={24} color="black" /> */}
-                        <Text style={styles.toggleText}>Deep Dive</Text>
-                      </TouchableOpacity>
-                    </Animated.View>
-
-                    <Animated.View
-                      style={{
-                        transform: [
-                          {translateY: iconTranslateY}, // Apply icon's Y translation
-                          {rotate: rotate}, // Apply rotation
-                        ],
-                      }}>
-                      <TouchableOpacity
-                        onPress={toggleSlide}
-                        style={styles.toggleButton}>
-                        <Icon
-                          name="keyboard-arrow-down"
-                          size={60}
-                          color="white"
-                        />
-                      </TouchableOpacity>
-                    </Animated.View>
-                  </View>
-                </View>
-              </View>
+              <Image
+                source={{
+                  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEFlCxAfL-D3y4JVh8rnRPUoQ5pMsbf6cjAg&s',
+                }}
+                style={styles.userImage}
+              />
             </View>
           </View>
-        </DrawerProvider>
-      </SafeAreaView>
-    </SafeAreaProvider>
+
+          {/* Toggle Options */}
+          <View style={styles.toggleWrapper}>
+            <View>
+              <Animated.View
+                style={{
+                  transform: [{translateY: slideAnim}],
+                  width: 250,
+                  height: 90,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                  gap: 10,
+                  backgroundColor: AppColors.gray_200,
+                  padding: 10,
+                  borderRadius: 20,
+                  zIndex: -1,
+                  paddingBottom: 10,
+                  overflow: 'hidden',
+                  borderColor: AppColors.light_blue_300,
+                  borderWidth: 2,
+                }}>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    mode !== 'deep_research'
+                      ? styles.outlined
+                      : styles.filledGray,
+                  ]}
+                  onPress={handleResearchToggle}>
+                  <DeepresearchIcon height={25} width={25} />
+                  <Text style={styles.toggleText}>I.D.E.A Hub</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    mode === 'deep_dive' ? styles.filledGray : styles.outlined,
+                  ]}
+                  onPress={handleDeepDiveToggle}>
+                  <AntDesign name="search1" size={20} color={'black'} />
+                  {/* <EvilIcons name="search" size={24} color="black" /> */}
+                  <Text style={styles.toggleText}>Deep Dive</Text>
+                </TouchableOpacity>
+              </Animated.View>
+
+              <Animated.View
+                style={{
+                  transform: [
+                    {translateY: iconTranslateY}, // Apply icon's Y translation
+                    {rotate: rotate}, // Apply rotation
+                  ],
+                }}>
+                <TouchableOpacity
+                  onPress={toggleSlide}
+                  style={styles.toggleButton}>
+                  <Icon name="keyboard-arrow-down" size={60} color="white" />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };
 

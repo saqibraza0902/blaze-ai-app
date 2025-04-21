@@ -7,6 +7,8 @@ import {
   Animated,
   ScrollView,
   Image,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -24,16 +26,19 @@ import {Colors} from '../../constant/Colors';
 import NewChatIcon from '../../ui/icons/new-chat-icon';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const HEIGHT = Dimensions.get('window').height;
 const DRAWER_WIDTH = SCREEN_WIDTH; // 80% of screen width
 
 type Props = {
   visible?: boolean;
-  onClose?: () => void;
+  onClose: () => void;
+  handleDelFol: (id: number) => void;
 };
 
-export const LeftDrawer = ({onClose, visible}: Props) => {
+export const LeftDrawer = ({onClose, visible, handleDelFol}: Props) => {
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const {conversations, folders} = useAppSelector(s => s.convo);
+  const [folderMenu, setFolderMenu] = useState(false);
   const groupedConversations = groupConversationsByTime(conversations);
   const {theme} = useAppSelector(s => s.theme);
   const dispatch = useAppDispatch();
@@ -113,8 +118,10 @@ export const LeftDrawer = ({onClose, visible}: Props) => {
                     <FolderItem
                       accordionOpen={accordionOpen}
                       folder={folder}
+                      handleOpenMenu={() => setFolderMenu(true)}
                       setAccordionOpen={setAccordionOpen}
                       onClose={onClose}
+                      handleDelFol={handleDelFol}
                     />
                   </View>
                 ))}
@@ -203,10 +210,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    height: '100%',
+    height: HEIGHT,
     width: SCREEN_WIDTH,
-    // backgroundColor: '#444',
-    zIndex: 100,
+    paddingVertical: 10,
+    zIndex: 50,
   },
   close: {
     padding: 16,
@@ -274,7 +281,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   settingsContainer: {
+    position: 'static',
     padding: 15,
+    paddingBottom: 25,
   },
   settingsText: {
     color: '#fff',
