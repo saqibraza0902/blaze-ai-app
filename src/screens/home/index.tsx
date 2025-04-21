@@ -160,6 +160,7 @@ const Home = ({toggleDrawer}: IProp) => {
 
   const colors = Colors[theme];
   return (
+
     <View style={{height: HEIGHT, backgroundColor: colors.screenbg}}>
       <View
         style={{
@@ -286,6 +287,7 @@ const Home = ({toggleDrawer}: IProp) => {
                   <Text style={styles.toggleText}>Deep Dive</Text>
                 </TouchableOpacity>
               </Animated.View>
+
 
               <Animated.View
                 style={{

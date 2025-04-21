@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Svg, {Path} from 'react-native-svg';
-import {IconProps} from '../general-icon';
-const ProductionDevIcon: React.FC<IconProps> = ({fill, ...props}) => (
+
+import {SVGComponentProps} from '../knowledge-based-icon';
+const ProductionDevIcon: React.FC<SVGComponentProps> = ({fill, ...props}) => (
   <Svg viewBox="0 0 1024 1024" {...props}>
     <Path
       fill={fill}

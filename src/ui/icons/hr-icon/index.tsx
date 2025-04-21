@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Svg, {Defs, ClipPath, Path, G} from 'react-native-svg';
-import {IconProps} from '../general-icon';
-const HrIcon: React.FC<IconProps> = ({fill, ...props}) => (
+
+import {SVGComponentProps} from '../knowledge-based-icon';
+const HrIcon: React.FC<SVGComponentProps> = ({fill, ...props}) => (
   <Svg
     viewBox="0 0 375 374.999991"
     preserveAspectRatio="xMidYMid meet"

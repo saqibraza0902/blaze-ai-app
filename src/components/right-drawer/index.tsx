@@ -9,6 +9,8 @@ import {
 import React, {useEffect, useRef} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import IdeaHubSetting from '../idea-hub-setting';
+import {useAppSelector} from '../../hooks/useRedux';
+import {Colors} from '../../constant/Colors';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Props = {
@@ -18,7 +20,8 @@ type Props = {
 
 export const RightDrawer = ({visible, onClose}: Props) => {
   const translateX = useRef(new Animated.Value(SCREEN_WIDTH)).current;
-
+  const {theme} = useAppSelector(s => s.theme);
+  const colors = Colors[theme];
   useEffect(() => {
     Animated.timing(translateX, {
       toValue: visible ? 0 : SCREEN_WIDTH,
@@ -33,13 +36,26 @@ export const RightDrawer = ({visible, onClose}: Props) => {
         styles.drawer,
         {
           transform: [{translateX}],
+          backgroundColor: colors.drawerbg,
         },
       ]}>
-      <Pressable onPress={onClose} style={styles.close}>
-        <AntDesign name="close" size={24} color="#fff" />
-      </Pressable>
+      <View
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignContent: 'flex-end',
+          alignItems: 'flex-end',
+        }}>
+        <Pressable onPress={onClose} style={styles.close}>
+          <AntDesign
+            name="close"
+            size={24}
+            color={theme === 'dark' ? '#fff' : '#000'}
+          />
+        </Pressable>
+      </View>
 
-      <View>
+      <View style={{marginTop: -45}}>
         <IdeaHubSetting />
       </View>
     </Animated.View>
@@ -53,11 +69,13 @@ const styles = StyleSheet.create({
     right: 0,
     height: '100%',
     width: SCREEN_WIDTH,
-    backgroundColor: '#000000',
+
     zIndex: 100,
   },
   close: {
     padding: 16,
-    alignItems: 'flex-end',
+    width: 60,
+
+    zIndex: 100,
   },
 });
