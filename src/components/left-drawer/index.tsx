@@ -58,7 +58,10 @@ export const LeftDrawer = ({
   const [accordionOpen, setAccordionOpen] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const height = folders.length < 2 ? 60 : folders.length * 30;
+
+  //  const nav = useNavigation();
   const [Insmodel, setInsmodel] = useState(false);
+
   useEffect(() => {
     Animated.timing(translateX, {
       toValue: visible ? 0 : -DRAWER_WIDTH,
@@ -182,13 +185,19 @@ export const LeftDrawer = ({
                     <View key={groupKey} style={styles.groupContainer}>
                       <Text style={styles.groupTitle}>{groupLabel}</Text>
                       {convos.map((item, idx) => (
-                        <View key={idx}>
+                        <Pressable
+                          onPress={() => {
+                            // @ts-ignore
+                            router.navigate('Home', {id: item.conversation_id});
+                            onClose();
+                          }}
+                          key={idx}>
                           <ConversationItem
                             key={item.conversation_id}
                             props={{convo: item, id: item.conversation_id}}
                             // onClose={onClose}
                           />
-                        </View>
+                        </Pressable>
                       ))}
                     </View>
                   );
@@ -226,7 +235,7 @@ const styles = StyleSheet.create({
     height: HEIGHT,
     width: SCREEN_WIDTH,
     paddingVertical: 10,
-    zIndex: 50,
+    zIndex: 500,
   },
   close: {
     padding: 16,

@@ -11,6 +11,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import {IConversations, IFolder, IParticipant} from '../../utils/types';
 import {useAppSelector} from '../../hooks/useRedux';
+import Toast from 'react-native-simple-toast';
 import {
   assign_convo_admin,
   assign_folder_admin,
@@ -28,6 +29,7 @@ import RemoveUserIcon from '../../ui/icons/remove-user-icon';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import CustomSelect from '../../ui/form/custom-select';
+import {useNavigation} from '@react-navigation/native';
 
 interface IProp {
   folder: IFolder | null;
@@ -36,12 +38,11 @@ interface IProp {
   newsOpen: () => void;
 }
 const SharedUsers = ({conversation, folder, handleClose, newsOpen}: IProp) => {
-  //  const {token} = useAppSelector(s => s.modal);
   const [participants, setParticipants] = useState([]);
   const [add, setAdd] = useState(false);
+
   const [showInvite, setShowInvite] = useState(false);
   const folder_id = folder?.id;
-  //  const router = useRouter();
   const conversation_id = conversation?.conversation_id;
   const {user} = useAppSelector(s => s.user);
 
@@ -78,7 +79,7 @@ const SharedUsers = ({conversation, folder, handleClose, newsOpen}: IProp) => {
         removeFolderUser(token, id);
       }
     } catch (error) {
-      //  toast.error('Error');
+      Toast.show('Error', 500);
     }
   };
   const RandomColor = () => {
@@ -98,7 +99,7 @@ const SharedUsers = ({conversation, folder, handleClose, newsOpen}: IProp) => {
         assignFolderAdmin(token, id);
       }
     } catch (error) {
-      //  toast.error('Error');
+      Toast.show('Error', 500);
     } finally {
       handleClose();
     }
@@ -107,62 +108,58 @@ const SharedUsers = ({conversation, folder, handleClose, newsOpen}: IProp) => {
   const removeConvoUser = async (token: string, uid: string) => {
     const id = conversation_id;
     if (!id) {
-      return;
-      //  return toast.error('Conversation id required');
+      return Toast.show('Conversation id required', 500);
     }
     try {
       const data = await remove_convo_user({id, token, uid});
-      //  toast.success(data.message);
+      Toast.show(data.message, 500);
       const update = participants.filter((el: IParticipant) => el.id !== uid);
       setParticipants(update);
     } catch (error) {
       const err = handleApiError(error);
-      //  toast.error(err);
+      Toast.show(err, 500);
     }
   };
   const removeFolderUser = async (token: string, uid: string) => {
     const id = folder_id;
     if (!id) {
-      return;
-      //  return toast.error('Folder id required');
+      return Toast.show('Folder id required', 500);
     }
     try {
       const data = await remove_folder_user({id, token, uid});
-      //  toast.success(data.message);
+      Toast.show(data.message, 500);
       const update = participants.filter((el: IParticipant) => el.id !== uid);
       setParticipants(update);
     } catch (error) {
       const err = handleApiError(error);
-      //  toast.error(err);
+      Toast.show(err, 500);
     }
   };
 
   const assignConvoAdmin = async (token: string, uid: string) => {
     const id = conversation_id;
     if (!id) {
-      return;
-      //  return toast.error('Conversation id required');
+      return Toast.show('Conversation id required', 500);
     }
     try {
       const data = await assign_convo_admin({id, token, uid});
-      //  toast.success(data.message);
+      Toast.show(data.message, 500);
     } catch (error) {
       const err = handleApiError(error);
-      //  toast.error(err);
+      Toast.show(err, 500);
     }
   };
   const assignFolderAdmin = async (token: string, uid: string) => {
     const id = folder_id;
     if (!id) {
-      return;
-      //  return toast.error('Folder id required');
+      return Toast.show('Folder id required', 500);
     }
     try {
       const data = await assign_folder_admin({id, token, uid});
-      //  toast.success(data.message);
+      Toast.show(data.message, 500);
     } catch (error) {
       const err = handleApiError(error);
-      //  toast.error(err);
+      Toast.show(err, 500);
     }
   };
   const MySharedUsers = () => {
@@ -252,13 +249,16 @@ const SharedUsers = ({conversation, folder, handleClose, newsOpen}: IProp) => {
 
         <View style={styles.arrowContainer}>
           <TouchableOpacity onPress={() => setShowinvitation(!showInvitation)}>
-            <Animated.View style={{transform: [{rotate: '90deg'}]}}>
+            <Animated.View
+              style={{
+                transform: [{rotate: showInvitation ? '180deg' : '0deg'}],
+              }}>
               <AntDesign name="arrowdown" size={35} color="white" />
             </Animated.View>
           </TouchableOpacity>
         </View>
 
-        <View style={{maxHeight: 400, overflow: 'hidden'}}>
+        <View style={{maxHeight: showInvitation ? 400 : 0, overflow: 'hidden'}}>
           <InviteUser
             conversation_id={conversation_id}
             folder_id={folder_id}
@@ -328,7 +328,6 @@ const InviteUser = ({
     maxuser: '',
   });
   const [email, setEmail] = useState('');
-  //   const {token} = useAppSelector(s => s.modal);
   const [link, setLink] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -358,21 +357,13 @@ const InviteUser = ({
       if (formField.expirydate !== '') {
         body.expires_in_hours = Number(formField.expirydate);
       }
-      console.log('body', body, token);
       const data = await send_invite(JSON.stringify(token), body);
-      console.log(data);
+
       setLink(data?.invite_link);
-      //   Toast.show({
-      //     type: 'success',
-      //     text1: data.status,
-      //   });
+      Toast.show('Success', 500);
     } catch (error) {
       const err = handleApiError(error);
-      console.log(err);
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: err,
-      //   });
+      Toast.show(err, 500);
     } finally {
       setLoading(false);
     }
@@ -398,11 +389,8 @@ const InviteUser = ({
     };
 
     if (!email || !validateEmail(email)) {
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: 'Please enter a valid email',
-      //   });
-      //   return;
+      Toast.show('Please enter a valid email', 500);
+      return;
     }
 
     try {
@@ -411,18 +399,11 @@ const InviteUser = ({
         : {conversation_id: conversation_id, email: email};
 
       const data = await send_invite(token, body);
-      //   Toast.show({
-      //     type: 'success',
-      //     text1: data.status,
-      //   });
-      console.log('Inivite data', data);
+      Toast.show(data.status, 500);
       handleClose();
     } catch (error) {
       const err = handleApiError(error);
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: err,
-      //   });
+      Toast.show(err, 500);
     }
   };
 

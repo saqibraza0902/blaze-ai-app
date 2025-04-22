@@ -6,45 +6,28 @@ import {useAppSelector} from '../../hooks/useRedux';
 import Home from '../../screens/home';
 import ModalPopover from '../modal';
 import DeleteFolder from '../delete-folder';
+
+import ChatScreen from '../../screens/chat';
+
 import {PickedFile} from '../../utils/functions';
+
 
 // Define the props type
 interface IProp {
   toggleDrawer: (key: 'left' | 'right' | 'top') => void;
-  delFolder: {
-    open: boolean;
-    id: string;
-  };
-  delClose: () => void;
-  uploadFile: () => void;
+   uploadFile: () => void;
   ClearFile: any;
   file: any;
+  id: string | undefined;
 }
 
-const HomeLayout = ({
-  toggleDrawer,
-  delFolder,
-  delClose,
-  uploadFile,
-  ClearFile,
-  file,
-}: IProp) => {
-  console.log('logscree', file);
+const HomeLayout = ({toggleDrawer, id}: IProp) => {
   return (
-    <SafeAreaProvider>
-      <Home
-        toggleDrawer={toggleDrawer}
-        ClearFile={ClearFile}
+    <View>
+      {id ? <ChatScreen id={id} /> : <Home   ClearFile={ClearFile}
         uploadFile={uploadFile}
-        file={file }
-      />
-      <ModalPopover
-        backgroundColor="#000"
-        onClose={delClose}
-        open={delFolder.open}>
-        <DeleteFolder />
-      </ModalPopover>
-    </SafeAreaProvider>
+        file={file } toggleDrawer={toggleDrawer} />}
+    </View>
   );
 };
 
