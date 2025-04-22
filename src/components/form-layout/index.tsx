@@ -47,16 +47,19 @@ const Form = ({
       {file && (
         <View style={styles.fileContainer}>
           <Text style={styles.fileText}>
+            {file.name.length > 10
+              ? `${file.name.slice(0, 10)}...${file.name.slice(-4)}`
+              : file.name}
             {/* {truncateFileName(file.name, 10)} */}
-            <TouchableOpacity onPress={clearFile}>
-              <Text style={styles.clearIcon}>✖</Text>
-            </TouchableOpacity>
           </Text>
+          <TouchableOpacity onPress={clearFile}>
+            <Text style={styles.clearIcon}>✖</Text>
+          </TouchableOpacity>
         </View>
       )}
 
       <View style={styles.form}>
-        <Pressable>
+        <Pressable onPress={handleFileChange}>
           <IoniconsIcon
             name="attach"
             size={28}
@@ -101,19 +104,19 @@ const styles = StyleSheet.create({
   },
   fileContainer: {
     position: 'absolute',
-    top: -24,
-    left: 10,
+    top: -40,
+    left: 20,
     flexDirection: 'row',
+    gap: 8,
     alignItems: 'center',
-    backgroundColor: '#1E3A8A', // Example background color
-    padding: 4,
+    backgroundColor: '#0D0D0D', // Example background color
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     borderRadius: 8,
   },
   fileText: {
     color: '#fff',
     fontSize: 12,
-    flex: 1,
-    marginRight: 4,
   },
   clearIcon: {
     color: '#fff',

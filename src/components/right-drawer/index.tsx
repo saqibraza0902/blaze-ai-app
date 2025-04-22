@@ -12,6 +12,7 @@ import IdeaHubSetting from '../idea-hub-setting';
 import {useAppSelector} from '../../hooks/useRedux';
 import {Colors} from '../../constant/Colors';
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_Height = Dimensions.get('window').height;
 
 type Props = {
   visible: boolean;
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    height: '100%',
+    height: SCREEN_Height,
     width: SCREEN_WIDTH,
 
     zIndex: 100,

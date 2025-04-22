@@ -7,6 +7,7 @@ import {
   Image,
   Modal,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -107,7 +108,7 @@ const Settings = ({
       text: 'Profile Settings',
       icon: 'person',
       action: () => {
-        // navigation.navigate('ProfileSettings');
+        Linking.openURL('https://www.blazeai.io/profile-settings');
         onClose?.();
       },
     },

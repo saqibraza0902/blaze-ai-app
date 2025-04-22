@@ -15,6 +15,7 @@ import ToggleSwitch from '../../ui/form/toggle-switch';
 import KnowledgeBased from '../../ui/icons/knowledge-based-icon';
 import {AppColors} from '../../constant/Colors';
 import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
+import Toast from 'react-native-simple-toast';
 import {Modals} from '../../utils/enums';
 import {
   setConvoSettings,
@@ -77,7 +78,7 @@ const BottomActions = ({
       }
     } else {
       // toast.show({ type: "error", text1: "Please update your plan" });
-      console.log('Please update your plan');
+      Toast.show('Please update your plan', Toast.LONG);
     }
   };
 
@@ -90,13 +91,11 @@ const BottomActions = ({
       if (modal === Modals.BlazeMax) {
         openTopDrawer && openTopDrawer();
       } else {
-        // toast.show({ type: "error", text1: "Please turn on Blaze Max" });
-
-        console.log('Please turn on Blaze Max');
+        Toast.show('Please turn on Blaze Max', Toast.LONG);
       }
     } else {
       // toast.show({ type: "error", text1: "Please update your plan" });
-      console.log('Please update your plan');
+      Toast.show('Please update your plan', Toast.LONG);
     }
   };
   const Show_Focus_Model = () => {
@@ -132,14 +131,14 @@ const BottomActions = ({
       <View style={[styles.row, {justifyContent: justify}]}>
         {/* Left Section */}
         <View style={styles.leftSection}>
-          <View style={[styles.toggleContainer]}>
+          <Pressable onPress={handleToggle} style={[styles.toggleContainer]}>
             <ToggleSwitch
               onToggle={handleToggle}
               initialValue={modal === Modals.BlazeMax ? true : false}
             />
 
             <Text style={styles.label}>Blaze Max</Text>
-          </View>
+          </Pressable>
           <FocusMenu />
           <Modal
             visible={showmenu}
@@ -209,19 +208,11 @@ const BottomActions = ({
         {/* Right Section */}
         <TouchableOpacity
           onPress={handleKnowledgeBase}
-          style={styles.kbContainer}
-          //   onPress={handleKnowledgeBase}
-        >
-          {/* <KnowledgeBaseIcon
-            height={40}
-            width={40}
-            color={modal === Modals.BlazeMax ? "#68BEBF" : "#000"}
-          /> */}
+          style={styles.kbContainer}>
           <KnowledgeBased
             style={{width: 30, height: 30}}
             fill={modal === Modals.BlazeMax ? '#68BEBF' : 'white'}
           />
-          {/* <Text style={styles.kbLabel}>Knowledge Base</Text> */}
         </TouchableOpacity>
       </View>
     </View>

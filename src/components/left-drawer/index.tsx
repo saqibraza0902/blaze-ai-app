@@ -24,6 +24,8 @@ import Settings from '../settings';
 import AddFolderIcon from '../../ui/icons/add-folder-icon';
 import {Colors} from '../../constant/Colors';
 import NewChatIcon from '../../ui/icons/new-chat-icon';
+import ModalPopover from '../modal';
+import InstructionModel from '../instruction-model';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -56,7 +58,7 @@ export const LeftDrawer = ({
   const [accordionOpen, setAccordionOpen] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const height = folders.length < 2 ? 60 : folders.length * 30;
-
+  const [Insmodel, setInsmodel] = useState(false);
   useEffect(() => {
     Animated.timing(translateX, {
       toValue: visible ? 0 : -DRAWER_WIDTH,
@@ -207,10 +209,11 @@ export const LeftDrawer = ({
       <View style={styles.settingsContainer}>
         <Settings
           openFeedback={() => console.log('object')}
-          toggleInstructionModal={() => console.log('object')}
+          toggleInstructionModal={() => setInsmodel(true)}
           onClose={onClose}
         />
       </View>
+      <InstructionModel Open={Insmodel} onClose={() => setInsmodel(false)} />
     </Animated.View>
   );
 };
