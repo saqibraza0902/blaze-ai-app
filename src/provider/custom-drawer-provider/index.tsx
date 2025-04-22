@@ -11,6 +11,7 @@ import {IConversations, IFolder} from '../../utils/types';
 import ModalPopover from '../../components/modal';
 import EditFolder from '../../components/edit-folder';
 import SharedUsers from '../../components/shared-users';
+import DeleteFolder from '../../components/delete-folder';
 
 type DrawerType = 'left' | 'right' | 'top';
 interface IEditFolder {
@@ -22,7 +23,9 @@ interface IShare {
   open: boolean;
   conversation: null | IConversations;
 }
-const DrawerProvider = () => {
+const DrawerProvider = (params: any) => {
+  const id = params?.route?.params?.id;
+
   const {theme} = useAppSelector(s => s.theme);
   const [delFolder, setDelFolder] = useState({
     open: false,
@@ -77,11 +80,14 @@ const DrawerProvider = () => {
         <TopDrawer visible={drawers.top} onClose={closeAllDrawers} />
 
         <View>
-          <HomeLayout
-            delClose={() => setDelFolder({id: '', open: false})}
-            toggleDrawer={key => toggleDrawer(key)}
-            delFolder={delFolder}
-          />
+          <HomeLayout id={id} toggleDrawer={key => toggleDrawer(key)} />
+
+          <ModalPopover
+            backgroundColor="#000"
+            onClose={() => setDelFolder({id: '', open: false})}
+            open={delFolder.open}>
+            <DeleteFolder />
+          </ModalPopover>
           <ModalPopover
             backgroundColor="#000"
             onClose={() => setIsEditFolder({folder: null, open: false})}

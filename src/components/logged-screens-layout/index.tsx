@@ -6,28 +6,20 @@ import {useAppSelector} from '../../hooks/useRedux';
 import Home from '../../screens/home';
 import ModalPopover from '../modal';
 import DeleteFolder from '../delete-folder';
+import ChatScreen from '../../screens/chat';
 
 // Define the props type
 interface IProp {
   toggleDrawer: (key: 'left' | 'right' | 'top') => void;
-  delFolder: {
-    open: boolean;
-    id: string;
-  };
-  delClose: () => void;
+
+  id: string | undefined;
 }
 
-const HomeLayout = ({toggleDrawer, delFolder, delClose}: IProp) => {
+const HomeLayout = ({toggleDrawer, id}: IProp) => {
   return (
-    <SafeAreaProvider>
-      <Home toggleDrawer={toggleDrawer} />
-      <ModalPopover
-        backgroundColor="#000"
-        onClose={delClose}
-        open={delFolder.open}>
-        <DeleteFolder />
-      </ModalPopover>
-    </SafeAreaProvider>
+    <View>
+      {id ? <ChatScreen id={id} /> : <Home toggleDrawer={toggleDrawer} />}
+    </View>
   );
 };
 
