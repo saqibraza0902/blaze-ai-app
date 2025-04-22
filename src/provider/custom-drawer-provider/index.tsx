@@ -7,19 +7,40 @@ import HomeLayout from '../../components/logged-screens-layout';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Colors} from '../../constant/Colors';
 import {useAppSelector} from '../../hooks/useRedux';
+import {IConversations, IFolder} from '../../utils/types';
+import ModalPopover from '../../components/modal';
+import EditFolder from '../../components/edit-folder';
+import SharedUsers from '../../components/shared-users';
 
 type DrawerType = 'left' | 'right' | 'top';
-
+interface IEditFolder {
+  open: boolean;
+  folder: IFolder | null;
+}
+interface IShare {
+  folder: null | IFolder;
+  open: boolean;
+  conversation: null | IConversations;
+}
 const DrawerProvider = () => {
   const {theme} = useAppSelector(s => s.theme);
   const [delFolder, setDelFolder] = useState({
     open: false,
     id: '',
   });
+  const [isEditfolder, setIsEditFolder] = useState<IEditFolder>({
+    open: false,
+    folder: null,
+  });
   const [drawers, setDrawers] = useState({
     left: false,
     right: false,
     top: false,
+  });
+  const [shareFolder, setShareFolder] = useState<IShare>({
+    open: false,
+    folder: null,
+    conversation: null,
   });
 
   // Single function to toggle any drawer
@@ -45,6 +66,10 @@ const DrawerProvider = () => {
       <SafeAreaView style={{flex: 1, backgroundColor: colors.screenbg}}>
         <LeftDrawer
           handleDelFol={id => setDelFolder({id: id.toString(), open: true})}
+          editOpen={(f: IFolder) => setIsEditFolder({folder: f, open: true})}
+          sharedUsers={(f, c) =>
+            setShareFolder({open: true, folder: f, conversation: c})
+          }
           visible={drawers.left}
           onClose={closeAllDrawers}
         />
@@ -54,9 +79,34 @@ const DrawerProvider = () => {
         <View>
           <HomeLayout
             delClose={() => setDelFolder({id: '', open: false})}
-            toggleDrawer={key => toggleDrawer(key)} // Pass the toggle function to children
+            toggleDrawer={key => toggleDrawer(key)}
             delFolder={delFolder}
           />
+          <ModalPopover
+            backgroundColor="#000"
+            onClose={() => setIsEditFolder({folder: null, open: false})}
+            open={isEditfolder.open}>
+            <EditFolder
+              folder={isEditfolder.folder}
+              handleClose={() => setIsEditFolder({folder: null, open: false})}
+            />
+          </ModalPopover>
+          <ModalPopover
+            backgroundColor="#000"
+            onClose={() =>
+              setShareFolder({folder: null, open: false, conversation: null})
+            }
+            open={shareFolder.open}>
+            <SharedUsers
+              conversation={shareFolder.conversation}
+              folder={shareFolder.folder}
+              newsOpen={() => {}}
+              // newsOpen={() => setNews({id: 1, open: true})}
+              handleClose={() =>
+                setShareFolder({folder: null, open: false, conversation: null})
+              }
+            />
+          </ModalPopover>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

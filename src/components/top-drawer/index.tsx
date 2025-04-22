@@ -26,7 +26,7 @@ import {
   search_file,
 } from '../../utils/functions';
 import {handleApiError} from '../../utils/error';
-import {Hardtoken} from '../../mock';
+import {token} from '../../mock';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 type Props = {
@@ -51,7 +51,7 @@ export const TopDrawer = ({visible, onClose}: Props) => {
 
   const onSearch = async () => {
     try {
-      const res = await search_file(Hardtoken, user?.id || '', searchTerm, 5);
+      const res = await search_file(token, user?.id || '', searchTerm, 5);
       setMyData(res.data.data);
     } catch (error) {
       // toast.error(handleApiError(error));
@@ -94,7 +94,7 @@ export const TopDrawer = ({visible, onClose}: Props) => {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${Hardtoken}`,
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         },
