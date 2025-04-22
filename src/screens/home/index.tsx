@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Animated,
   Pressable,
+  Switch,
 } from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import DrawerProvider from '../../provider/custom-drawer-provider';
@@ -160,8 +161,8 @@ const Home = ({toggleDrawer}: IProp) => {
 
   const colors = Colors[theme];
   return (
-
-    <View style={{height: HEIGHT, backgroundColor: colors.screenbg}}>
+    <View
+      style={{height: HEIGHT, backgroundColor: colors.screenbg, zIndex: 100}}>
       <View
         style={{
           padding: 10,
@@ -173,12 +174,20 @@ const Home = ({toggleDrawer}: IProp) => {
           width: '100%',
         }}>
         <Pressable onPress={() => toggleDrawer('left')}>
-          <FontAwesome6 name="bars-staggered" size={24} color="white" />
+          <FontAwesome6
+            name="bars-staggered"
+            size={24}
+            color={theme === 'dark' ? 'white' : 'black'}
+          />
         </Pressable>
         {mode === 'deep_research' && (
           <Animated.View style={{opacity: fadeAnim}}>
             <Pressable onPress={() => toggleDrawer('right')}>
-              <MaterialIcons name="arrow-back-ios" size={40} color="white" />
+              <MaterialIcons
+                name="arrow-back-ios"
+                size={40}
+                color={theme === 'dark' ? 'white' : 'black'}
+              />
             </Pressable>
           </Animated.View>
         )}
@@ -288,7 +297,6 @@ const Home = ({toggleDrawer}: IProp) => {
                 </TouchableOpacity>
               </Animated.View>
 
-
               <Animated.View
                 style={{
                   transform: [
@@ -299,9 +307,14 @@ const Home = ({toggleDrawer}: IProp) => {
                 <TouchableOpacity
                   onPress={toggleSlide}
                   style={styles.toggleButton}>
-                  <Icon name="keyboard-arrow-down" size={60} color="white" />
+                  <Icon
+                    name="keyboard-arrow-down"
+                    size={60}
+                    color={theme === 'dark' ? 'white' : 'black'}
+                  />
                 </TouchableOpacity>
               </Animated.View>
+              
             </View>
           </View>
         </View>
