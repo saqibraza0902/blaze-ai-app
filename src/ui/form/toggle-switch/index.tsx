@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flexDirection: 'row',
+    zIndex: 1000,
   },
   label: {
     fontSize: 16,

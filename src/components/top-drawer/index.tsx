@@ -15,18 +15,25 @@ import {ScrollView} from 'react-native';
 import KnowledgeBased from '../../ui/icons/knowledge-based-icon';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import ProgressBar from '../progress-bar';
-import {useFilePicker} from '../../hooks/useFilepicker';
-import AddFileIcon from '../../ui/icons/add-file-icon';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
+import Toast from 'react-native-simple-toast';
+import Feather from 'react-native-vector-icons/Feather';
 import {useAppSelector} from '../../hooks/useRedux';
 import {
   api,
+  get_single_file,
   get_vector_files,
+  pickSingleFile,
   retrieve_vector_store,
   search_file,
 } from '../../utils/functions';
 import {handleApiError} from '../../utils/error';
-import {Hardtoken} from '../../mock';
+import {token} from '../../mock';
+import PdfIcon from '../../ui/icons/pdf-icon';
+import ModalPopover from '../modal';
+import {Colors} from '../../constant/Colors';
+import {ActivityIndicator} from 'react-native';
+import DeletePdfFile from '../pdf-file-delete-modal';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 type Props = {
@@ -36,48 +43,65 @@ type Props = {
 
 export const TopDrawer = ({visible, onClose}: Props) => {
   const translateY = useRef(new Animated.Value(-SCREEN_HEIGHT)).current;
-  const [openState, setOpenState] = React.useState(false);
+  const [openTooltip, setOpenTooltip] = React.useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [myData, setMyData] = useState([]);
+  const [deleteFileId, setDeleteFileId] = useState<string | null>(null);
+  const {theme} = useAppSelector(s => s.theme);
+  const themeColor = Colors[theme];
   // const {token} = useAppSelector(s => s.modal);
   const {user} = useAppSelector(s => s.user);
-  // const [file, setFile] = React.useState<any | null>(null);
+  // const {token} = useAppSelector(s => s.modal);
+  // const {user} = useAppSelector(s => s.user);
+  // const {theme} = useTheme();
+  const [singleData, setSingleData] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setloading] = useState(false);
   const [data, setData] = React.useState<any | []>([]);
   const [usedData, setUsedData] = useState(0);
   const FreeUser = user?.planConnections[0].type === 'FREE' ? true : false;
-  useEffect(() => {
-    setMyData(data);
-  }, [data]);
+  const PLAN_STORAGE: Record<string, number> = {
+    'pln_pro-5mkr0qxs': 3, // Pro = 3GB
+    'pln_pro-plus-o71680g29': 5, // Pro-Plus = 5GB
+    'pln_ultra-eb1c20cwc': 15, // Enterprise = 15GB
+    'pln_free-sg1h00cy3': 0, // Free = 0GB
+  };
+  const storage = PLAN_STORAGE[user?.planConnections[0].planId] || 0;
 
+  const totalGB = usedData / 1024 ** 3;
+  const usedPercentage = storage > 0 ? (totalGB / storage) * 100 : 0;
+
+  /* ________ONSearch_____________________________ */
   const onSearch = async () => {
     try {
-      const res = await search_file(Hardtoken, user?.id || '', searchTerm, 5);
-      setMyData(res.data.data);
+      const res = await search_file(token, user?.id || '', searchTerm, 5);
+      setData(res.data.data);
     } catch (error) {
       // toast.error(handleApiError(error));
       console.warn('error');
     }
   };
+  /* ___________GET ALL DATA FILES__________________________ */
+  const getdata = async () => {
+    try {
+      const res = await get_vector_files(token);
+      const storeres = await retrieve_vector_store(token);
+      setData(res?.data);
+      setUsedData(storeres?.data?.usage_bytes);
+    } catch (error) {
+      const err = handleApiError(error);
+      // toast.error(err);
+      console.log('error', err);
+    }
+  };
+  useEffect(() => {
+    if (FreeUser) return;
 
-  // useEffect(() => {
-  //   if (FreeUser) return;
-  //   const getdata = async () => {
-  //     try {
-  //       const res = await get_vector_files(token);
-  //       const storeres = await retrieve_vector_store(token);
-  //       setData(res?.data);
-  //       setUsedData(storeres?.data?.usage_bytes);
-  //     } catch (error) {
-  //       const err = handleApiError(error);
-  //       // toast.error(err);
-  //       console.log('error', err);
-  //     }
-  //   };
-  //   getdata();
-  // }, [file, deleteOpen]);
-  const {pickFile} = useFilePicker();
+    getdata();
+  }, [searchTerm, deleteFileId]);
+
+  /* _________UPLOAD FILE AND POST _________________________ */
   const uploadFile = async () => {
-    const file = await pickFile();
+    const file = await pickSingleFile();
     if (!file) return;
 
     try {
@@ -94,30 +118,25 @@ export const TopDrawer = ({visible, onClose}: Props) => {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${Hardtoken}`,
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         },
       );
-
-      // toast.success('Upload successful');
-      console.log('Success');
-      console.log('success Response', response);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('Upload error details:', errorData);
+        throw new Error('Upload failed');
+      }
+      getdata();
+      Toast.showWithGravity('Successfully added', Toast.SHORT, Toast.CENTER);
+      console.log('Success Response:', await response.json());
     } catch (error) {
       console.error('Upload failed', error);
       // toast.error('Upload failed');
     }
   };
-  const PLAN_STORAGE: Record<string, number> = {
-    'pln_pro-5mkr0qxs': 3, // Pro = 3GB
-    'pln_pro-plus-o71680g29': 5, // Pro-Plus = 5GB
-    'pln_ultra-eb1c20cwc': 15, // Enterprise = 15GB
-    'pln_free-sg1h00cy3': 0, // Free = 0GB
-  };
-  const storage = PLAN_STORAGE[user?.planConnections[0].planId] || 0;
 
-  const totalGB = usedData / 1024 ** 3;
-  const usedPercentage = storage > 0 ? (totalGB / storage) * 100 : 0;
   useEffect(() => {
     Animated.timing(translateY, {
       toValue: visible ? 0 : -SCREEN_HEIGHT,
@@ -125,38 +144,22 @@ export const TopDrawer = ({visible, onClose}: Props) => {
       useNativeDriver: true,
     }).start();
   }, [visible]);
-  // const {token} = useAppSelector(s => s.modal);
-  // const {user} = useAppSelector(s => s.user);
-  // const {theme} = useTheme();
-  //
-  //
-  // const [singleData, setSingleData] = useState<any | null>(null);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [loading, setloading] = useState(false);
 
-  // const getSingleDetail = async (id: string) => {
-  //   try {
-  //     setloading(true);
-  //     setIsModalOpen(true);
-  //     const res = await get_single_file(token, id);
-  //     setSingleData(res.data); // Store the fetched data
-  //     // Open the modal
-  //   } catch (error) {
-  //     toast.error(handleApiError(error));
-  //   } finally {
-  //     setloading(false);
-  //   }
-  // };
-  // const {file, pickFile} = useFilePicker();
+  const getSingleDetail = async (id: string) => {
+    try {
+      setloading(true);
+      setIsModalOpen(true);
+      const res = await get_single_file(token, id);
+      setSingleData(res.data); // Store the fetched data
+      // Open the modal
+    } catch (error) {
+      // toast.error(handleApiError(error));
+    } finally {
+      setloading(false);
+    }
+  };
 
-  // const handlePickFile = async () => {
-  //   const picked = await pickFile();
-  //   if (picked) {
-  //     console.log('Picked file:', picked);
-  //     console.log('file file:', file);
-  //   }
-  // };
-  console.log('myData', myData);
+  console.log('myData', deleteFileId);
   return (
     <Animated.ScrollView
       style={[
@@ -167,9 +170,17 @@ export const TopDrawer = ({visible, onClose}: Props) => {
       ]}>
       <View style={{padding: 10}}>
         <View style={styles.HeaderContainer}>
-          <Pressable>
+          <Pressable onPress={() => setOpenTooltip(prev => !prev)}>
             <AntDesign name="questioncircleo" size={35} color="black" />
           </Pressable>
+          {/* ____ToolTIP______ */}
+          {openTooltip && (
+            <View style={styles.TooltipWrapper}>
+              <Text style={{color: 'white', fontSize: 14, fontWeight: '700'}}>
+                Enhance Blaze Max’s knowledge by adding your documents.
+              </Text>
+            </View>
+          )}
           <View style={{flex: 1}}>
             <View
               style={{
@@ -183,15 +194,17 @@ export const TopDrawer = ({visible, onClose}: Props) => {
                 Knowledge Base
               </Text>
               <View style={{width: '80%', marginTop: 10}}>
-                <ProgressBar total={80} value={30} />
+                <ProgressBar total={storage} value={usedPercentage} />
               </View>
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Search files..."
                   placeholderTextColor="#aaa"
                   style={styles.inputStyle}
+                  value={searchTerm}
+                  onChangeText={text => setSearchTerm(text)}
                 />
-                <TouchableOpacity>
+                <TouchableOpacity onPressOut={onSearch}>
                   <AntDesign name="search1" size={20} color="#fff" />
                 </TouchableOpacity>
               </View>
@@ -202,31 +215,142 @@ export const TopDrawer = ({visible, onClose}: Props) => {
           </Pressable>
         </View>
         {/* ________BODY__________________________________ */}
-        <View>
+        <View style={styles.pdf_wrapper}>
           <View>
-            <Pressable onPress={() => uploadFile()}>
-              <FontAwesome5 name="file-upload" size={130} />
-            </Pressable>
-            {/* <Pressable onPress={handlePickFile}>
-            <Text>Click Me</Text>
-            </Pressable> */}
+            <View>
+              <Pressable onPress={() => uploadFile()}>
+                <Feather name="upload" size={105} />
+              </Pressable>
+            </View>
+          </View>
+          {data.map((content: any, i: number) => (
+            <View
+              key={i}
+              // onPress={() => getSingleDetail(content.id)}
+            >
+              <View
+                style={{
+                  alignSelf: 'flex-end',
+
+                  marginBottom: -15,
+                }}>
+                <TouchableOpacity onPress={() => setDeleteFileId(content.id)}>
+                  <AntDesign
+                    name="closecircleo"
+                    color={theme !== 'dark' ? '#000' : '#000'}
+                    size={25}
+                  />
+                </TouchableOpacity>
+              </View>
+              <Pressable onPress={() => getSingleDetail(content.id)}>
+                <PdfIcon style={{width: 105, height: 105}} />
+
+                <Text
+                  style={{fontSize: 12, textAlign: 'center'}}
+                  numberOfLines={1}>
+                  {content?.attributes?.filename?.length > 10
+                    ? `${content?.attributes?.filename.substring(0, 10)}...`
+                    : content?.attributes?.filename}
+                </Text>
+              </Pressable>
+              <DeletePdfFile
+                open={deleteFileId === content.id}
+                onClose={() => {
+                  setDeleteFileId(null);
+                  getdata();
+                }}
+                fileId={content.id}
+                FileName={content?.attributes?.filename}
+              />
+            </View>
+          ))}
+        </View>
+      </View>
+      {/* ______________File Details______________________________ */}
+      <ModalPopover
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ContainerStyle={{
+          width: '100%',
+          height: 'auto',
+        }}
+        backgroundColor={themeColor.dropdownbg}>
+        <View>
+          <Text style={{fontSize: 18, fontWeight: '700', textAlign: 'center'}}>
+            File Details
+          </Text>
+          {!loading ? (
+            <>
+              <View>
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    flexDirection: 'row',
+                    marginVertical: 10,
+                  }}>
+                  <Text style={{fontSize: 14}}>FileName:</Text>
+                  <Text
+                    style={{fontSize: 14, fontWeight: '500'}}
+                    numberOfLines={1}>
+                    {singleData?.attributes?.filename?.length > 20
+                      ? `${singleData?.attributes?.filename.substring(
+                          0,
+                          20,
+                        )}...`
+                      : singleData?.attributes?.filename}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    flexDirection: 'row',
+                  }}>
+                  <Text style={{fontSize: 14}}>FileSize:</Text>
+                  <Text
+                    style={{fontSize: 14, fontWeight: '500'}}
+                    numberOfLines={1}>
+                    {singleData?.usage_bytes} Bytes
+                  </Text>
+                </View>
+              </View>
+            </>
+          ) : (
+            <>
+              <ActivityIndicator
+                color={'black'}
+                size={'large'}
+                style={{marginTop: 10}}
+              />
+            </>
+          )}
+          <View>
+            <TouchableOpacity
+              onPress={() => setIsModalOpen(false)}
+              style={{
+                backgroundColor: '#EF4444',
+                padding: 10,
+                borderRadius: 15,
+                width: 100,
+                marginTop: 10,
+              }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: 'white',
+                  textAlign: 'center',
+                  fontWeight: '600',
+                }}>
+                Close
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-        {myData.map((content, i) => (
-          <TouchableOpacity
-            key={i}
-            // onPress={() => getSingleDetail(content.id)}
-            activeOpacity={0.7}>
-            {/* Delete Icon */}
-            <TouchableOpacity>
-              {/* <DeleteFileIcon fill={theme !== 'dark' ? '#000' : '#000'} /> */}
-            </TouchableOpacity>
-
-            {/* <PdfFileIcon /> */}
-            <Text numberOfLines={1}></Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      </ModalPopover>
+      {/* ____________Delete File Modal ____________________ */}
     </Animated.ScrollView>
   );
 };
@@ -265,5 +389,24 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     flex: 1,
+    color: 'white',
+  },
+  pdf_wrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  TooltipWrapper: {
+    backgroundColor: '#7C7C7C',
+    position: 'absolute',
+    width: 200,
+    padding: 10,
+    zIndex: 100,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'black',
+    top: 30,
+    left: 30,
   },
 });

@@ -472,3 +472,53 @@ export const get_feedback = async (token: string) => {
   }
   return res.json();
 };
+// utils/filePicker.ts
+import {pick, keepLocalCopy} from '@react-native-documents/picker';
+
+export interface PickedFile {
+  uri: string;
+  name: string;
+  type: string | null;
+  size: number | null;
+  fileCopyUri?: string;
+}
+/* _________File */
+export const pickSingleFile = async (): Promise<PickedFile | null> => {
+  try {
+    const [res] = await pick({
+      type: ['*/*'], // all file types
+    });
+
+    const [localCopy] = await keepLocalCopy({
+      files: [
+        {
+          uri: res.uri,
+          fileName: res.name ?? 'unnamed',
+        },
+      ],
+      destination: 'documentDirectory',
+    });
+
+    if (localCopy.status === 'success') {
+      return {
+        uri: localCopy.localUri,
+        name: res.name ?? 'unnamed',
+        type: res.type ?? null,
+        size: res.size ?? null,
+        fileCopyUri: localCopy.localUri,
+      };
+    } else {
+      console.error('Copy failed:', localCopy.copyError);
+      return null;
+    }
+  } catch (err: any) {
+    if (err.name === 'AbortError' || err.message?.includes('cancel')) {
+      // ❌ Don't show anything for cancel
+      return null;
+    } else {
+      // Log other unexpected errors
+      console.error('Error picking file:', err);
+      return null;
+    }
+  }
+};

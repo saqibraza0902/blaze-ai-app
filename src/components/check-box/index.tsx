@@ -25,7 +25,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
   fillColor = 'white',
   borderColor = '#000',
   borderWidth = 2,
-  duration = 10, // 👈 Faster animation
+  duration = 150,
   style,
 }) => {
   const scaleAnim = useRef(new Animated.Value(checked ? 1 : 0)).current;
@@ -48,16 +48,19 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
             borderWidth,
             borderColor,
             backgroundColor: 'transparent',
+            justifyContent: 'center',
+            alignItems: 'center',
             overflow: 'hidden',
           },
           style,
         ]}>
         <Animated.View
           style={{
-            ...StyleSheet.absoluteFillObject,
+            width: size-6,
+            height: size-6,
             backgroundColor: fillColor,
-            transform: [{scaleX: scaleAnim}],
-            transformOrigin: 'left', // 👈 not required, but helps visualize
+            transform: [{scale: scaleAnim}],
+            borderRadius: size / 6, // Optional rounded inner box
           }}
         />
       </View>
