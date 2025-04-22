@@ -31,18 +31,22 @@ import {
   get_folders,
   get_member,
   list_conversations,
+  PickedFile,
 } from '../../utils/functions';
 import {token} from '../../mock';
 import {setConversation, setFolders} from '../../redux/slices/conversation';
 import {setUser} from '../../redux/slices/user';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import HomeLayout from '../../components/logged-screens-layout';
-
+import Toast from 'react-native-simple-toast';
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 interface IProp {
   toggleDrawer: (key: 'left' | 'right' | 'top') => void;
+  uploadFile: () => void;
+  ClearFile: any;
+  file: any;
 }
-const Home = ({toggleDrawer}: IProp) => {
+const Home = ({toggleDrawer, uploadFile, ClearFile, file}: IProp) => {
   const [expanded, setExpanded] = useState(false);
   const animatedHeight = useRef(new Animated.Value(0)).current;
   const rotateValue = useRef(new Animated.Value(0)).current;
@@ -54,8 +58,6 @@ const Home = ({toggleDrawer}: IProp) => {
   const {models, mode} = conversation_setting;
   let freeuser = false;
   let isLoggedIn = true;
-
-  console.log('mode', mode);
 
   useEffect(() => {
     const get_data = async () => {
@@ -77,7 +79,7 @@ const Home = ({toggleDrawer}: IProp) => {
   const toggleSlide = () => {
     const toTranslateY = expanded ? -60 : 15;
     const toRotate = expanded ? 0 : 1;
-    const toIconTranslate = expanded ? -3 : 2; // change icon's Y translation
+    const toIconTranslate = expanded ? -3 : 2;
 
     Animated.parallel([
       Animated.timing(slideAnim, {
@@ -142,8 +144,7 @@ const Home = ({toggleDrawer}: IProp) => {
         dispatch(setConvoSettings({key: 'mode', value: setmode}));
       }
     } else {
-      // toast.error("Please Update your Plan");
-      console.log('Please Update your Plan');
+      Toast.show('Please Update your Plan', Toast.LONG);
     }
   };
   /* _______Deep Search Animation_____ */
@@ -160,6 +161,7 @@ const Home = ({toggleDrawer}: IProp) => {
   }, [mode]);
 
   const colors = Colors[theme];
+  console.log('homefile', file);
   return (
     <View
       style={{height: HEIGHT, backgroundColor: colors.screenbg, zIndex: 100}}>
@@ -223,9 +225,9 @@ const Home = ({toggleDrawer}: IProp) => {
           <View style={styles.inputRow}>
             <View style={styles.inputBox}>
               <BubbleSubmitBox
-                clearFile={() => {}}
-                file={null}
-                handleFileChange={() => {}}
+                clearFile={ClearFile}
+                file={file}
+                handleFileChange={uploadFile}
                 inputValue=""
                 loading={false}
                 onChange={() => {}}
@@ -314,7 +316,6 @@ const Home = ({toggleDrawer}: IProp) => {
                   />
                 </TouchableOpacity>
               </Animated.View>
-              
             </View>
           </View>
         </View>
