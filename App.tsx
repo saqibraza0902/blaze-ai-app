@@ -26,12 +26,12 @@ const App = () => {
   return (
     <ReduxProvider>
       <ThemeProvider>
-        <MenuProvider>
-          <NavigationContainer>
-            <StackNavigator />
-            <StatusBar barStyle={'default'} />
-          </NavigationContainer>
-        </MenuProvider>
+        {/* <MenuProvider> */}
+        <NavigationContainer>
+          <StackNavigator />
+          <StatusBar barStyle={'default'} />
+        </NavigationContainer>
+        {/* </MenuProvider> */}
       </ThemeProvider>
     </ReduxProvider>
   );

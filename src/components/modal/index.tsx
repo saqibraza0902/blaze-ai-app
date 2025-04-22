@@ -16,7 +16,7 @@ interface IProp {
   onClose?: () => void;
   children: React.ReactNode;
   ContainerStyle?: StyleProp<ViewStyle>;
-  backgroundColor?: any;
+  backgroundColor?: string;
 }
 const ModalPopover = ({
   children,
@@ -27,6 +27,10 @@ const ModalPopover = ({
 }: IProp) => {
   const {theme} = useAppSelector(s => s.theme);
   const colors = Colors[theme];
+
+  // Use the passed backgroundColor if provided, otherwise use the theme color
+  const containerBackgroundColor = backgroundColor || colors.popoverbg;
+
   return (
     <Modal
       visible={open}
@@ -37,6 +41,7 @@ const ModalPopover = ({
         <View
           style={[
             styles.menuContainer,
+
             {
               backgroundColor: !backgroundColor
                 ? colors.popoverbg
@@ -56,26 +61,17 @@ export default ModalPopover;
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-
     backgroundColor: 'rgba(0,0,0,0.1)',
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
-    padding: 20, // Optional: Add some padding around the modal
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   menuContainer: {
     borderRadius: 16,
-    width: '80%',
+    width: '90%',
     padding: 16,
     gap: 25,
     zIndex: 40,
-    height: 400,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 4,
-    // elevation: 5,
   },
   modalContentView: {
     flexDirection: 'row',

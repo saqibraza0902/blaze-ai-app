@@ -33,9 +33,17 @@ type Props = {
   visible?: boolean;
   onClose: () => void;
   handleDelFol: (id: number) => void;
+  editOpen: (folder: IFolder) => void;
+  sharedUsers: (f: IFolder | null, c: IConversations | null) => void;
 };
 
-export const LeftDrawer = ({onClose, visible, handleDelFol}: Props) => {
+export const LeftDrawer = ({
+  onClose,
+  visible,
+  handleDelFol,
+  editOpen,
+  sharedUsers,
+}: Props) => {
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const {conversations, folders} = useAppSelector(s => s.convo);
   const [folderMenu, setFolderMenu] = useState(false);
@@ -122,6 +130,8 @@ export const LeftDrawer = ({onClose, visible, handleDelFol}: Props) => {
                       setAccordionOpen={setAccordionOpen}
                       onClose={onClose}
                       handleDelFol={handleDelFol}
+                      editOpen={editOpen}
+                      sharedUsers={sharedUsers}
                     />
                   </View>
                 ))}

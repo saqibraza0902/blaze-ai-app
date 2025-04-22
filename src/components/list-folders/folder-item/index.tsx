@@ -37,6 +37,8 @@ interface IFolderItemProps {
   onClose: () => void;
   handleOpenMenu?: () => void;
   handleDelFol: (id: number) => void;
+  editOpen: (folder: IFolder) => void;
+  sharedUsers: (f: IFolder | null, c: IConversations | null) => void;
 }
 
 const CONVERSATION_ITEM_HEIGHT = 60; // Adjust this based on your ConversationItem height
@@ -50,6 +52,8 @@ const FolderItem = ({
   onClose,
   handleOpenMenu,
   handleDelFol,
+  editOpen,
+  sharedUsers,
 }: IFolderItemProps) => {
   const {conversations} = useAppSelector(s => s.convo);
   const [folderMenu, setFolderMenu] = useState(false);
@@ -117,13 +121,17 @@ const FolderItem = ({
                   styles.menuContainer,
                   {backgroundColor: colors.popoverbg},
                 ]}>
-                <View style={styles.modalContentView}>
-                  <Text style={{color: '#fff', fontSize: 16}}>Edit Folder</Text>
-                  <FontAwesome name="edit" size={18} color="#fff" />
-                </View>
                 <Pressable
                   onPress={() => {
-                    handleDelFol(folder.id), onClose();
+                    editOpen(folder), onClose(), setFolderMenu(false);
+                  }}
+                  style={styles.modalContentView}>
+                  <Text style={{color: '#fff', fontSize: 16}}>Edit Folder</Text>
+                  <FontAwesome name="edit" size={18} color="#fff" />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    handleDelFol(folder.id), onClose(), setFolderMenu(false);
                   }}
                   style={styles.modalContentView}>
                   <Text style={{color: '#fff', fontSize: 16}}>
@@ -133,12 +141,16 @@ const FolderItem = ({
                     <FontAwesome name="trash-o" size={20} color="#fff" />
                   </View>
                 </Pressable>
-                <View style={styles.modalContentView}>
+                <Pressable
+                  onPress={() => {
+                    sharedUsers(folder, null), onClose(), setFolderMenu(false);
+                  }}
+                  style={styles.modalContentView}>
                   <Text style={{color: '#fff', fontSize: 16}}>
                     Shared Users
                   </Text>
                   <FontAwesome name="share-square-o" size={18} color="#fff" />
-                </View>
+                </Pressable>
               </View>
             </Pressable>
           </Modal>
