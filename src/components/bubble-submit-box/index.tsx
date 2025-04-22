@@ -1,7 +1,8 @@
-import React from "react";
-import { View } from "react-native";
-import Form from "../form-layout";
-import BottomActions from "../chat-bottom-actions";
+import React from 'react';
+import {View} from 'react-native';
+import Form from '../form-layout';
+import BottomActions from '../chat-bottom-actions';
+import {PickedFile} from '../../utils/functions';
 
 interface IProp {
   handleFileChange: () => void;
@@ -26,7 +27,7 @@ const BubbleSubmitBox = ({
   vectorOpen,
 }: IProp) => {
   return (
-    <View style={{ marginBottom: -15 }}>
+    <View style={{marginBottom: -15}}>
       <Form
         InputMaxheight="100"
         handleFileChange={handleFileChange}

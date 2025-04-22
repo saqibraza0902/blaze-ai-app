@@ -483,11 +483,26 @@ export interface PickedFile {
   fileCopyUri?: string;
 }
 /* _________File */
-export const pickSingleFile = async (): Promise<PickedFile | null> => {
+type PickFileOptions = {
+  maxSizeMB?: number; // optional limit in megabytes
+};
+
+export const pickSingleFile = async (
+  options?: PickFileOptions,
+): Promise<PickedFile | null> => {
   try {
     const [res] = await pick({
-      type: ['*/*'], // all file types
+      type: ['*/*'],
     });
+
+    if (
+      options?.maxSizeMB &&
+      res.size &&
+      res.size > options.maxSizeMB * 1024 * 1024
+    ) {
+      console.warn(`File is larger than ${options.maxSizeMB}MB`);
+      return null;
+    }
 
     const [localCopy] = await keepLocalCopy({
       files: [
@@ -513,10 +528,8 @@ export const pickSingleFile = async (): Promise<PickedFile | null> => {
     }
   } catch (err: any) {
     if (err.name === 'AbortError' || err.message?.includes('cancel')) {
-      // ❌ Don't show anything for cancel
       return null;
     } else {
-      // Log other unexpected errors
       console.error('Error picking file:', err);
       return null;
     }

@@ -11,6 +11,8 @@ import {IConversations, IFolder} from '../../utils/types';
 import ModalPopover from '../../components/modal';
 import EditFolder from '../../components/edit-folder';
 import SharedUsers from '../../components/shared-users';
+import {PickedFile, pickSingleFile} from '../../utils/functions';
+import Toast from 'react-native-simple-toast';
 
 type DrawerType = 'left' | 'right' | 'top';
 interface IEditFolder {
@@ -42,7 +44,7 @@ const DrawerProvider = () => {
     folder: null,
     conversation: null,
   });
-
+  const [fileupload, setFileupload] = useState<PickedFile | undefined>();
   // Single function to toggle any drawer
   const toggleDrawer = (drawer: DrawerType) => {
     console.log(drawer);
@@ -61,6 +63,17 @@ const DrawerProvider = () => {
     });
   };
   const colors = Colors[theme];
+  /* ___Upload File ___ */
+  const uploadFile = async () => {
+    const file = await pickSingleFile({maxSizeMB: 10});
+    if (file) {
+      setFileupload(file);
+      Toast.show('File Uploaded', Toast.LONG);
+    } else {
+      console.log('No file picked or operation cancelled.');
+    }
+  };
+  // console.log('uploadedfile', fileupload);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{flex: 1, backgroundColor: colors.screenbg}}>
@@ -81,6 +94,9 @@ const DrawerProvider = () => {
             delClose={() => setDelFolder({id: '', open: false})}
             toggleDrawer={key => toggleDrawer(key)}
             delFolder={delFolder}
+            uploadFile={uploadFile}
+            ClearFile={() => setFileupload(undefined)}
+            file={fileupload}
           />
           <ModalPopover
             backgroundColor="#000"
