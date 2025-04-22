@@ -12,7 +12,7 @@ import GeneralIcon from '../../ui/icons/general-icon';
 import {get_conversation_setting} from '../../utils/functions';
 import {handleApiError} from '../../utils/error';
 import CustomCheckbox from '../check-box';
-import {color} from 'native-base/lib/typescript/theme/styled-system';
+
 import {Colors} from '../../constant/Colors';
 
 const IdeaHubSetting = () => {

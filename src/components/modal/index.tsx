@@ -1,4 +1,11 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native';
 import React from 'react';
 import {Modal} from 'react-native';
 import {Colors} from '../../constant/Colors';
@@ -8,9 +15,16 @@ interface IProp {
   open?: boolean;
   onClose?: () => void;
   children: React.ReactNode;
-  backgroundColor?: string; // Add this new prop
+  ContainerStyle?: StyleProp<ViewStyle>;
+  backgroundColor?: string;
 }
-const ModalPopover = ({children, onClose, open, backgroundColor}: IProp) => {
+const ModalPopover = ({
+  children,
+  onClose,
+  open,
+  ContainerStyle,
+  backgroundColor,
+}: IProp) => {
   const {theme} = useAppSelector(s => s.theme);
   const colors = Colors[theme];
 
@@ -27,7 +41,13 @@ const ModalPopover = ({children, onClose, open, backgroundColor}: IProp) => {
         <View
           style={[
             styles.menuContainer,
-            {backgroundColor: containerBackgroundColor},
+
+            {
+              backgroundColor: !backgroundColor
+                ? colors.popoverbg
+                : backgroundColor,
+            },
+            ContainerStyle,
           ]}>
           {children}
         </View>

@@ -137,6 +137,7 @@ const BottomActions = ({
               onToggle={handleToggle}
               initialValue={modal === Modals.BlazeMax ? true : false}
             />
+
             <Text style={styles.label}>Blaze Max</Text>
           </View>
           <FocusMenu />
